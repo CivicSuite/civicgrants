@@ -65,7 +65,7 @@ def root() -> dict[str, str]:
             "legal advice, live LLM calls, submission portals, and grant system-of-record integrations "
             "are not implemented yet."
         ),
-        "next_step": "Post-v0.1.0 roadmap: local grant catalog configuration, CivicRecords file links, and staff review queues",
+        "next_step": "Post-v0.1.1 roadmap: local grant catalog configuration, CivicRecords file links, and staff review queues",
     }
 
 

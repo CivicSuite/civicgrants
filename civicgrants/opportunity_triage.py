@@ -1,4 +1,4 @@
-"""Deterministic grant opportunity triage helpers for CivicGrants v0.1.0."""
+"""Deterministic grant opportunity triage helpers for CivicGrants v0.1.1."""
 
 from __future__ import annotations
 

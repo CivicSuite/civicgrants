@@ -1,4 +1,4 @@
-"""Grant eligibility matching helpers for CivicGrants v0.1.0."""
+"""Grant eligibility matching helpers for CivicGrants v0.1.1."""
 
 from __future__ import annotations
 

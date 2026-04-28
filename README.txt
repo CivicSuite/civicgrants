@@ -3,7 +3,7 @@ CivicGrants
 
 CivicGrants is the CivicSuite module for grant opportunity triage, eligibility-factor matching, application outline support, compliance-calendar scaffolding, and audit-ready grant files.
 
-Current state: v0.1.0 grant support foundation release. It ships deterministic sample helpers and an accessible public sample UI at /civicgrants.
+Current state: v0.1.1 grant support foundation release. It ships deterministic sample helpers and an accessible public sample UI at /civicgrants.
 
 Not shipped: live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, or grant system-of-record integrations.
 

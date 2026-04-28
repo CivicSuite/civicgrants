@@ -2,7 +2,7 @@
 
 CivicGrants is the CivicSuite module for grant opportunity triage, eligibility-factor matching, application outline support, compliance-calendar scaffolding, and audit-ready grant files.
 
-Current state: **v0.1.0 grant support foundation release**. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample opportunity triage, eligibility matching, application outline helper, compliance calendar helper, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, or grant system-of-record integrations.
+Current state: **v0.1.1 grant support foundation release**. This repo ships a FastAPI package aligned to `civiccore==0.3.0`, health/root endpoints, documentation gates, deterministic sample opportunity triage, eligibility matching, application outline helper, compliance calendar helper, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, or grant system-of-record integrations.
 
 ## What CivicGrants Does
 
@@ -18,7 +18,7 @@ Current state: **v0.1.0 grant support foundation release**. This repo ships a Fa
 - It does not decide official eligibility.
 - It does not submit grant applications.
 - It does not provide legal advice.
-- It does not call live LLMs in v0.1.0.
+- It does not call live LLMs in v0.1.1.
 - It does not replace a grant management system of record.
 
 ## API Surface

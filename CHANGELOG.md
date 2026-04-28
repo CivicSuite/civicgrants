@@ -4,6 +4,13 @@ All notable changes to CivicGrants will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.1] - 2026-04-28
+
+### Changed
+
+- Aligned CivicGrants to `civiccore==0.3.0` while preserving the v0.1 grant support foundation behavior.
+- Updated release gates, CI wheel install, docs, tests, and browser-visible version copy for the v0.1.1 compatibility release.
+
 ## [0.1.0] - 2026-04-27
 
 ### Added
