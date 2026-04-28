@@ -1,4 +1,4 @@
-"""Static public UI shell for CivicGrants v0.1.0."""
+"""Static public UI shell for CivicGrants v0.1.1."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def render_public_lookup_page() -> str:
   .kicker { color:var(--muted); font-size:.86rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
   footer { padding:38px 0 56px; color:var(--muted); }
   :focus-visible { outline:4px solid var(--gold); outline-offset:3px; }
-  @media (max-width:760px) { header{padding-top:34px}.card{grid-column:span 12;padding:20px;border-radius:22px}button{width:100%} }
+  @media (max-width:760px) { header,main,footer{margin:0;max-width:390px;width:100%;padding-left:24px;padding-right:24px}header{padding-top:34px}h1{font-size:clamp(2.2rem,11vw,3rem)}.card{grid-column:span 12;padding:20px;border-radius:22px}button{width:100%} }
 </style>
 </head>
 <body>
@@ -47,7 +47,7 @@ def render_public_lookup_page() -> str:
   <p class="eyebrow">CivicSuite / CivicGrants public sample</p>
   <h1>Keep grant opportunities from becoming spreadsheet archaeology.</h1>
   <p class="lede">CivicGrants demonstrates grant support: opportunity triage, eligibility factors, application outlines, compliance-calendar scaffolds, and audit-ready export checklists without making official eligibility or submission decisions.</p>
-  <p><span class="badge">v0.1.0 grant support foundation</span></p>
+  <p><span class="badge">v0.1.1 grant support foundation</span></p>
 </header>
 <main id="main" tabindex="-1">
   <section class="grid" aria-labelledby="lookup-title">
