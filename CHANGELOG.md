@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [0.1.1] - 2026-04-28
 
+### Added
+
+- Optional SQLAlchemy-backed grant opportunity and compliance-calendar records via `CIVICGRANTS_GRANT_DB_URL`.
+- Compliance-calendar retrieval endpoint for persisted grant records.
+
 ### Changed
 
 - Aligned CivicGrants to `civiccore==0.3.0` while preserving the v0.1 grant support foundation behavior.

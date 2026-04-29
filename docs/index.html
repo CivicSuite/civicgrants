@@ -12,12 +12,12 @@ body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:#17202a;background
 <header>
   <p class="eyebrow">CivicSuite / CivicGrants</p>
   <h1>Grant files that survive the audit.</h1>
-  <p class="lede">CivicGrants v0.1.1 ships a foundation for opportunity triage, eligibility factors, application outlines, compliance calendars, audit-ready exports, and an accessible sample UI.</p>
+  <p class="lede">CivicGrants v0.1.1 ships a foundation for opportunity triage, eligibility factors, application outlines, compliance calendars, optional database-backed grant records, audit-ready exports, and an accessible sample UI.</p>
   <p><span class="badge">Shipping v0.1.1</span></p>
 </header>
 <main>
   <section class="grid">
-    <article class="card"><h2>What ships</h2><ul><li>Sample opportunity triage.</li><li>Eligibility-factor matching.</li><li>Application outline helper.</li><li>Compliance calendar helper.</li><li>Audit-ready export checklist.</li><li>Public sample UI at <code>/civicgrants</code>.</li></ul></article>
+    <article class="card"><h2>What ships</h2><ul><li>Sample opportunity triage.</li><li>Eligibility-factor matching.</li><li>Application outline helper.</li><li>Compliance calendar helper.</li><li>Optional grant persistence with <code>CIVICGRANTS_GRANT_DB_URL</code>.</li><li>Audit-ready export checklist.</li><li>Public sample UI at <code>/civicgrants</code>.</li></ul></article>
     <article class="card"><h2>What does not ship</h2><p>CivicGrants does not determine official eligibility, submit applications, provide legal advice, call live LLMs, use live funder feeds, or replace the grant system of record.</p></article>
     <article class="card"><h2>Repository</h2><p><a href="https://github.com/CivicSuite/civicgrants">github.com/CivicSuite/civicgrants</a></p></article>
     <article class="card"><h2>Dependency</h2><p>Pinned to <code>civiccore==0.3.0</code>. CivicCore remains dependency-only; it never imports from CivicGrants.</p></article>

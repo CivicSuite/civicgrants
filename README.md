@@ -2,7 +2,7 @@
 
 CivicGrants is the CivicSuite module for grant opportunity triage, eligibility-factor matching, application outline support, compliance-calendar scaffolding, and audit-ready grant files.
 
-Current state: **v0.1.1 grant support foundation release**. This repo ships a FastAPI package aligned to `civiccore==0.3.0`, health/root endpoints, documentation gates, deterministic sample opportunity triage, eligibility matching, application outline helper, compliance calendar helper, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, or grant system-of-record integrations.
+Current state: **v0.1.1 grant support foundation plus grant persistence release**. This repo ships a FastAPI package aligned to `civiccore==0.3.0`, health/root endpoints, documentation gates, deterministic sample opportunity triage, eligibility matching, application outline helper, compliance calendar helper, optional database-backed grant opportunity and compliance records, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, or grant system-of-record integrations.
 
 ## What CivicGrants Does
 
@@ -10,6 +10,7 @@ Current state: **v0.1.1 grant support foundation release**. This repo ships a Fa
 - Match sample eligibility factors that staff must verify.
 - Draft application outlines for staff review.
 - Build compliance-calendar scaffolds for awarded grants.
+- Persist grant opportunity and compliance-calendar records when `CIVICGRANTS_GRANT_DB_URL` is configured.
 - Produce audit-ready export checklists for grant files.
 - Demonstrate a public grant-support UI at `/civicgrants`.
 
@@ -29,8 +30,19 @@ Current state: **v0.1.1 grant support foundation release**. This repo ships a Fa
 - `POST /api/v1/civicgrants/opportunities/triage` returns sample opportunity triage.
 - `POST /api/v1/civicgrants/eligibility/match` returns staff-review eligibility factors.
 - `POST /api/v1/civicgrants/applications/outline` returns an application outline.
-- `POST /api/v1/civicgrants/compliance/calendar` returns compliance reminders.
+- `POST /api/v1/civicgrants/compliance/calendar` returns compliance reminders and a `compliance_id` when persistence is configured.
+- `GET /api/v1/civicgrants/compliance/{compliance_id}` retrieves a persisted compliance calendar when `CIVICGRANTS_GRANT_DB_URL` is configured.
 - `POST /api/v1/civicgrants/export` returns an audit-file export checklist.
+
+## Optional Persistence
+
+Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records:
+
+```bash
+export CIVICGRANTS_GRANT_DB_URL="sqlite+pysqlite:///./civicgrants.db"
+```
+
+Without that variable, CivicGrants remains deterministic and stateless. Retrieval endpoints return actionable `503` responses that name the required configuration instead of silently failing.
 
 ## Local Development
 
