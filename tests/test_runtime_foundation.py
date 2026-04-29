@@ -18,7 +18,8 @@ def test_root_endpoint_states_runtime_boundary() -> None:
 
     assert payload["name"] == "CivicGrants"
     assert payload["version"] == "0.1.1"
-    assert payload["status"] == "grant support foundation"
+    assert payload["status"] == "grant support foundation plus grant persistence"
+    assert "database-backed grant opportunity and compliance records" in payload["message"]
     assert "official eligibility decisions" in payload["message"]
     assert "not implemented yet" in payload["message"]
     assert payload["next_step"].startswith("Post-v0.1.1 roadmap")
