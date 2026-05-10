@@ -36,7 +36,7 @@ def validate_grant_context_mocks(payload: dict[str, Any]) -> IntegrationMockResu
     if payload.get("legal_advice") is True:
         findings.append("Rejected legal-advice claim in grant integration context.")
     if payload.get("funder_feed_source") == "live":
-        findings.append("Rejected live funder-feed claim; v1.0.0 uses local deterministic context only.")
+        findings.append("Rejected live funder-feed claim; v0.2.0 uses local deterministic context only.")
     if payload.get("source_date_status") == "stale":
         findings.append("Stale records/grant context requires staff refresh before application drafting.")
 
@@ -49,6 +49,6 @@ def validate_grant_context_mocks(payload: dict[str, Any]) -> IntegrationMockResu
         boundary=(
             "CivicGrants validates local integration context only; it does not call live "
             "CivicRecords, funder feeds, LLM, submission portal, legal, award, or grant "
-            "system-of-record services in v1.0.0."
+            "system-of-record services in this recovery release."
         ),
     )

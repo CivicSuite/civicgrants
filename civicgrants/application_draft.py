@@ -1,4 +1,4 @@
-"""Grant application outline helpers for CivicGrants v1.0.0."""
+"""Grant application outline helpers for CivicGrants v0.2.0."""
 
 from __future__ import annotations
 

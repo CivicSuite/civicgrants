@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0] - 2026-05-10
+
+- Demoted the false v1.0.0 release label after the external CivicSuite audit found this module is a recovery/foundation module, not a canonical spec-complete v1 product.
+- Preserved the useful recovery work while resetting the public package version to 0.2.0.
+- Kept the CivicCore v1.0.0 wheel dependency and pinned it with SHA256 for release integrity.
+- Supersedes the prior public v1.0.0 posture; do not treat v1.0.0 as production-ready or spec-complete.
+
 All notable changes to CivicGrants will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
@@ -16,7 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- Public UI and runtime health/version surfaces now report the CivicGrants v1.0.0 productization lane.
+- Public UI and runtime health/version surfaces now report the CivicGrants v0.2.0 productization lane.
 
 ## [0.1.1] - 2026-04-28
 

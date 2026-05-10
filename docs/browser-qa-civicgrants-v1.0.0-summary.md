@@ -1,4 +1,4 @@
-# Browser QA - CivicGrants v1.0.0
+# Browser QA - CivicGrants v0.2.0
 
 Date: 2026-05-09
 
@@ -19,8 +19,8 @@ Date: 2026-05-09
 ## Results
 
 - Browser console: no console messages or page errors on all checked pages.
-- Desktop and mobile public UI render the `v1.0.0 grant support + staff review queues` badge.
-- Desktop and mobile docs render the `Shipping v1.0.0` badge.
+- Desktop and mobile public UI render the `v0.2.0 grant support + staff review queues` badge.
+- Desktop and mobile docs render the `Recovery v0.2.0` badge.
 - Keyboard/focus: first `Tab` reaches the public UI skip link; docs focus reaches the repository link.
 - Copy review: public and docs surfaces clearly state that CivicGrants does not determine eligibility, submit applications, accept awards, provide legal advice, call live LLMs/live funder feeds, or replace the grant system of record.
 - UI states: static public/docs surfaces have no async loading state; success/status content is visible; empty/error/partial states are covered through API tests for persistence and staff queue configuration failures.

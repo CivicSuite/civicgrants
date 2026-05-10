@@ -1,4 +1,4 @@
-"""Static public UI shell for CivicGrants v1.0.0."""
+"""Static public UI shell for CivicGrants v0.2.0."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def render_public_lookup_page() -> str:
   <p class="eyebrow">CivicSuite / CivicGrants public sample</p>
   <h1>Keep grant opportunities from becoming spreadsheet archaeology.</h1>
   <p class="lede">CivicGrants demonstrates grant support: opportunity triage, eligibility factors, application outlines, compliance-calendar scaffolds, staff review queues, CivicRecords context packets, and audit-ready export checklists without making official eligibility or submission decisions.</p>
-  <p><span class="badge">v1.0.0 grant support + staff review queues</span></p>
+  <p><span class="badge">v0.2.0 grant support + staff review queues</span></p>
 </header>
 <main id="main" tabindex="-1">
   <section class="grid" aria-labelledby="lookup-title">

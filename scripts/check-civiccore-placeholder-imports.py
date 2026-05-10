@@ -32,7 +32,7 @@ def main() -> int:
             package = match.group(1)
             if package in PLACEHOLDERS:
                 failures.append(
-                    f"{path}: civiccore.{package} is outside the CivicGrants v1.0.0 dependency contract. "
+                    f"{path}: civiccore.{package} is outside the CivicGrants v0.2.0 dependency contract. "
                     "See AGENTS.md section 3.1."
                 )
 
