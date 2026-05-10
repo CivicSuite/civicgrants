@@ -1,4 +1,4 @@
-"""Audit-ready export helpers for CivicGrants v0.1.1."""
+"""Audit-ready export helpers for CivicGrants v1.0.0."""
 
 from __future__ import annotations
 

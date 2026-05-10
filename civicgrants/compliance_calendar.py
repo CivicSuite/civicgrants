@@ -1,4 +1,4 @@
-"""Compliance calendar helpers for CivicGrants v0.1.1."""
+"""Compliance calendar helpers for CivicGrants v1.0.0."""
 
 from __future__ import annotations
 

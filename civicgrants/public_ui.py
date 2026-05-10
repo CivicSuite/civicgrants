@@ -1,4 +1,4 @@
-"""Static public UI shell for CivicGrants v0.1.1."""
+"""Static public UI shell for CivicGrants v1.0.0."""
 
 from __future__ import annotations
 
@@ -46,8 +46,8 @@ def render_public_lookup_page() -> str:
 <header>
   <p class="eyebrow">CivicSuite / CivicGrants public sample</p>
   <h1>Keep grant opportunities from becoming spreadsheet archaeology.</h1>
-  <p class="lede">CivicGrants demonstrates grant support: opportunity triage, eligibility factors, application outlines, compliance-calendar scaffolds, and audit-ready export checklists without making official eligibility or submission decisions.</p>
-  <p><span class="badge">v0.1.1 grant support foundation</span></p>
+  <p class="lede">CivicGrants demonstrates grant support: opportunity triage, eligibility factors, application outlines, compliance-calendar scaffolds, staff review queues, CivicRecords context packets, and audit-ready export checklists without making official eligibility or submission decisions.</p>
+  <p><span class="badge">v1.0.0 grant support + staff review queues</span></p>
 </header>
 <main id="main" tabindex="-1">
   <section class="grid" aria-labelledby="lookup-title">
@@ -62,9 +62,9 @@ def render_public_lookup_page() -> str:
       </div>
     </article>
     <article class="card"><p class="kicker">Eligibility</p><h2>Factors, not decisions</h2><div class="result"><p>CivicGrants can list sample eligibility factors, but staff must verify official eligibility in the funder notice.</p></div></article>
-    <article class="card"><p class="kicker">Application support</p><h2>Outline first</h2><div class="result"><p>Application outlines organize need, scope, budget, match, sustainability, and performance measures for staff drafting.</p></div></article>
+    <article class="card"><p class="kicker">Application support</p><h2>Outline first</h2><div class="result"><p>Application outlines organize need, scope, budget, match, sustainability, and performance measures, then route review work to staff when persistence is configured.</p></div></article>
     <article class="card"><p class="kicker">Audit file</p><h2>Preserve provenance</h2><div class="result"><p>Exports preserve opportunity notices, eligibility notes, approvals, application drafts, award agreements, reporting, and closeout records.</p></div></article>
-    <article class="card large"><p class="kicker">Boundary</p><h2>No official grant action</h2><div class="result warning"><p>CivicGrants does not determine eligibility, submit applications, provide legal advice, call live LLMs, or replace the grant system of record.</p></div></article>
+    <article class="card large"><p class="kicker">Boundary</p><h2>No official grant action</h2><div class="result warning"><p>CivicGrants does not determine eligibility, submit applications, accept awards, provide legal advice, call live LLMs, use live funder feeds, or replace the grant system of record.</p></div></article>
   </section>
 </main>
 <footer><p>CivicGrants is part of the Apache 2.0 CivicSuite open-source municipal AI project.</p></footer>
