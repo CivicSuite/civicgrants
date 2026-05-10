@@ -1,10 +1,10 @@
-# CivicGrants v1.0.0 Release Gate
+# CivicGrants v0.2.0 Release Gate
 
 Date: 2026-05-09
 
 ## Scope
 
-CivicGrants v1.0.0 productization for grant support, staff review queues, review-required CivicRecords/grant-file context packets, adversarial local integration mocks, CivicCore v1.0.0 release-wheel alignment, docs, tests, browser QA, and release artifacts.
+CivicGrants v0.2.0 productization for grant support, staff review queues, review-required CivicRecords/grant-file context packets, adversarial local integration mocks, CivicCore v1.0.0 release-wheel alignment, docs, tests, browser QA, and release artifacts.
 
 ## Internal Careful-Work Evidence
 

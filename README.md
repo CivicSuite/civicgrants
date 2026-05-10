@@ -2,7 +2,7 @@
 
 CivicGrants is the CivicSuite module for grant opportunity triage, eligibility-factor matching, application outline support, compliance-calendar scaffolding, staff review queues, review-required CivicRecords grant context packets, adversarial local integration mocks, and audit-ready grant files.
 
-Current state: **v1.0.0 grant support and staff review queue runtime**. This repo ships a FastAPI package aligned to the published CivicCore v1.0.0 release wheel, health/root endpoints, documentation gates, deterministic and database-backed grant opportunity triage, compliance-calendar records, staff-only review queue workflows, review-required CivicRecords/grant-file context packets, adversarial local integration mocks, application outline helper, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, award acceptance, or grant system-of-record integrations.
+Current state: **v0.2.0 grant support and staff review queue runtime**. This repo ships a FastAPI package aligned to the published CivicCore v1.0.0 release wheel, health/root endpoints, documentation gates, deterministic and database-backed grant opportunity triage, compliance-calendar records, staff-only review queue workflows, review-required CivicRecords/grant-file context packets, adversarial local integration mocks, application outline helper, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, award acceptance, or grant system-of-record integrations.
 
 ## What CivicGrants Does
 
@@ -23,7 +23,7 @@ Current state: **v1.0.0 grant support and staff review queue runtime**. This rep
 - It does not submit grant applications.
 - It does not accept grant awards.
 - It does not provide legal advice.
-- It does not call live LLMs or live funder feeds in v1.0.0.
+- It does not call live LLMs or live funder feeds in this recovery release.
 - It does not replace a grant management system of record.
 
 ## CivicCore Dependency

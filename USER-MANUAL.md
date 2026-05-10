@@ -4,7 +4,7 @@
 
 CivicGrants helps city staff keep grant opportunities, eligibility notes, application outlines, reporting dates, staff review queues, CivicRecords context references, and audit files organized. It can triage an opportunity, show eligibility factors for staff verification, draft an application outline, build a compliance-calendar scaffold, and preserve review-required grant file context.
 
-Current state: `1.0.0` grant support and staff review queue runtime. CivicGrants can optionally save grant opportunity, compliance-calendar, and staff review queue records when IT configures `CIVICGRANTS_GRANT_DB_URL`. Staff-only review routes also require `CIVICGRANTS_STAFF_API_KEY`. CivicGrants does not provide official eligibility decisions, legal advice, live funder feeds, live LLM calls, submission portals, award acceptance, or grant system-of-record updates. Staff own every decision.
+Current state: 0.2.0 grant support and staff review queue runtime. CivicGrants can optionally save grant opportunity, compliance-calendar, and staff review queue records when IT configures `CIVICGRANTS_GRANT_DB_URL`. Staff-only review routes also require `CIVICGRANTS_STAFF_API_KEY`. CivicGrants does not provide official eligibility decisions, legal advice, live funder feeds, live LLM calls, submission portals, award acceptance, or grant system-of-record updates. Staff own every decision.
 
 ## For IT and Technical Staff
 
@@ -44,11 +44,11 @@ bash scripts/verify-release.sh
 
 ```mermaid
 flowchart LR
-  Staff["Grant staff / finance / administration"] --> CivicGrants["CivicGrants v1.0.0"]
+  Staff["Grant staff / finance / administration"] --> CivicGrants["CivicGrants v0.2.0"]
   CivicGrants --> CivicCore["CivicCore v1.0.0"]
   CivicGrants -. released context ID .-> CivicRecords["CivicRecords AI"]
   CivicGrants --> Queue["Staff review queue"]
   CivicGrants --> Export["Audit-ready grant file export"]
 ```
 
-CivicGrants depends on CivicCore. CivicCore does not depend on CivicGrants. CivicGrants v1.0.0 uses deterministic sample data plus optional staff-gated persistence, review-required context packets for CivicRecords/grant-file references, staff review queue records, and adversarial local mocks for integration-depth validation.
+CivicGrants depends on CivicCore. CivicCore does not depend on CivicGrants. CivicGrants v0.2.0 uses deterministic sample data plus optional staff-gated persistence, review-required context packets for CivicRecords/grant-file references, staff review queue records, and adversarial local mocks for integration-depth validation.
