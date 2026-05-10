@@ -4,6 +4,20 @@ All notable changes to CivicGrants will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.0] - 2026-05-09
+
+### Added
+
+- CivicCore v1.0.0 release-wheel alignment.
+- Staff-only grant review queue workflows protected by `CIVICGRANTS_STAFF_API_KEY`.
+- Review-required CivicRecords/grant-file context packet endpoint.
+- Adversarial local integration mocks for spoofed roles, official eligibility attempts, submission attempts, award acceptance, legal-advice claims, stale context, and live funder-feed claims.
+- v1.0.0 docs, tests, browser QA evidence, release verification, and installer-integration requirement tracking.
+
+### Changed
+
+- Public UI and runtime health/version surfaces now report the CivicGrants v1.0.0 productization lane.
+
 ## [0.1.1] - 2026-04-28
 
 ### Added

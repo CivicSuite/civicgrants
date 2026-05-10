@@ -33,6 +33,7 @@ required=(
   "civicgrants/application_draft.py"
   "civicgrants/compliance_calendar.py"
   "civicgrants/audit_file.py"
+  "civicgrants/integration_mocks.py"
   "civicgrants/public_ui.py"
 )
 
@@ -52,6 +53,7 @@ bad_markers=(
   "live funder feeds are available"
   "live LLM calls are available"
   "submission portals are available"
+  "award acceptance is available"
   "system-of-record integrations are available"
   "production staff-review queues are available"
 )
@@ -66,4 +68,3 @@ for file in "${current_files[@]}"; do
 done
 
 echo "VERIFY-DOCS: PASSED"
-

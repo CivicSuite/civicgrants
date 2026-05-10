@@ -9,10 +9,10 @@
 ## Hard Boundaries
 
 - CivicGrants never determines official eligibility, submits applications, provides legal advice, or updates a grant system of record.
-- CivicGrants v0.1.0 must not call live LLMs or live funder feeds.
+- CivicGrants v1.0.0 must not call live LLMs or live funder feeds.
 - Application outlines and eligibility matches must be marked review-required.
 - CivicGrants depends on CivicCore; CivicCore must never depend on CivicGrants.
-- CivicGrants may reference CivicRecords concepts only through released contracts or deterministic sample data in v0.1.0.
+- CivicGrants may reference CivicRecords concepts only through released contracts, context IDs, or deterministic sample data in v1.0.0.
 
 ## Verification
 

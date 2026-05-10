@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.1.1"
+VERSION="1.0.0"
 
 find_python() {
   local candidates=()
   if [[ -n "${CIVICGRANTS_RELEASE_PYTHON:-}" ]]; then
     candidates+=("${CIVICGRANTS_RELEASE_PYTHON}")
   fi
-  command -v python >/dev/null 2>&1 && candidates+=("$(command -v python)")
   command -v python3 >/dev/null 2>&1 && candidates+=("$(command -v python3)")
+  command -v python >/dev/null 2>&1 && candidates+=("$(command -v python)")
   command -v py >/dev/null 2>&1 && candidates+=("py -3")
   [[ -x "/c/Windows/py.exe" ]] && candidates+=("/c/Windows/py.exe -3")
   [[ -x "/mnt/c/Windows/py.exe" ]] && candidates+=("/mnt/c/Windows/py.exe -3")
@@ -40,7 +40,7 @@ ${PYTHON_BIN} - <<'PY'
 from pathlib import Path
 import tomllib
 
-version = "0.1.1"
+version = "1.0.0"
 root = Path(".")
 pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
 assert pyproject["project"]["version"] == version, pyproject["project"]["version"]
@@ -56,8 +56,8 @@ for path in [
     "SECURITY.md",
 ]:
     text = (root / path).read_text(encoding="utf-8")
-    assert "0.1.1" in text, f"missing release version in {path}"
-    assert "0.1.1.dev0" not in text, f"stale dev version in {path}"
+    assert "1.0.0" in text, f"missing release version in {path}"
+    assert "1.0.0.dev0" not in text, f"stale dev version in {path}"
 print("PASS: version surfaces synchronized")
 PY
 
@@ -81,8 +81,8 @@ from pathlib import Path
 import hashlib
 
 dist = Path("dist")
-wheel = dist / "civicgrants-0.1.1-py3-none-any.whl"
-sdist = dist / "civicgrants-0.1.1.tar.gz"
+wheel = dist / "civicgrants-1.0.0-py3-none-any.whl"
+sdist = dist / "civicgrants-1.0.0.tar.gz"
 assert wheel.exists(), f"missing {wheel}"
 assert sdist.exists(), f"missing {sdist}"
 lines = []
@@ -94,4 +94,3 @@ print("PASS: build artifacts and SHA256SUMS.txt created")
 PY
 
 echo "VERIFY-RELEASE: PASSED"
-

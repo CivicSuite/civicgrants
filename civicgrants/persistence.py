@@ -41,6 +41,27 @@ grant_compliance_records = sa.Table(
     schema="civicgrants",
 )
 
+staff_review_queue_records = sa.Table(
+    "staff_review_queue_records",
+    metadata,
+    sa.Column("review_id", sa.String(36), primary_key=True),
+    sa.Column("grant_id", sa.String(255), nullable=True),
+    sa.Column("opportunity_title", sa.String(500), nullable=False),
+    sa.Column("status", sa.String(120), nullable=False),
+    sa.Column("reason", sa.Text(), nullable=False),
+    sa.Column("assigned_to", sa.String(255), nullable=True),
+    sa.Column("resolution", sa.Text(), nullable=True),
+    sa.Column("created_by", sa.String(120), nullable=False),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+    sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+    sa.Column("visibility", sa.String(120), nullable=False),
+    schema="civicgrants",
+)
+
+OPEN_STAFF_REVIEW_STATUSES = {"open", "in_review"}
+RESOLVED_STAFF_REVIEW_STATUSES = {"resolved", "closed"}
+STAFF_REVIEW_STATUSES = OPEN_STAFF_REVIEW_STATUSES | RESOLVED_STAFF_REVIEW_STATUSES
+
 
 @dataclass(frozen=True)
 class StoredComplianceCalendar:
@@ -50,6 +71,30 @@ class StoredComplianceCalendar:
     calendar_items: tuple[str, ...]
     staff_note: str
     created_at: datetime
+
+
+@dataclass(frozen=True)
+class StaffReviewQueueItem:
+    review_id: str
+    grant_id: str | None
+    opportunity_title: str
+    status: str
+    reason: str
+    assigned_to: str | None
+    resolution: str | None
+    created_by: str
+    created_at: datetime
+    updated_at: datetime
+    visibility: str = "staff_only"
+
+
+@dataclass(frozen=True)
+class StaffReviewSummary:
+    total_items: int
+    by_status: dict[str, int]
+    open_items: int
+    generated_at: datetime
+    visibility: str = "staff_only"
 
 
 class GrantRecordsRepository:
@@ -171,6 +216,97 @@ class GrantRecordsRepository:
             return None
         return _row_to_compliance_calendar(row)
 
+    def create_staff_review_queue_item(
+        self,
+        *,
+        opportunity_title: str,
+        reason: str,
+        grant_id: str | None = None,
+        created_by: str = "staff",
+    ) -> StaffReviewQueueItem:
+        now = datetime.now(UTC)
+        item = StaffReviewQueueItem(
+            review_id=str(uuid4()),
+            grant_id=grant_id,
+            opportunity_title=opportunity_title.strip() or "Untitled grant opportunity",
+            status="open",
+            reason=reason.strip() or "Grant support output requires staff review.",
+            assigned_to=None,
+            resolution=None,
+            created_by=created_by,
+            created_at=now,
+            updated_at=now,
+        )
+        with self.engine.begin() as connection:
+            connection.execute(staff_review_queue_records.insert().values(**_staff_queue_values(item)))
+        return item
+
+    def list_staff_review_queue_items(self, *, status: str | None = None) -> tuple[StaffReviewQueueItem, ...]:
+        with self.engine.begin() as connection:
+            statement = sa.select(staff_review_queue_records).order_by(
+                staff_review_queue_records.c.created_at
+            )
+            if status is not None:
+                statement = statement.where(staff_review_queue_records.c.status == status)
+            rows = connection.execute(statement).mappings().all()
+        return tuple(_row_to_staff_queue_item(row) for row in rows)
+
+    def update_staff_review_queue_item(
+        self,
+        *,
+        review_id: str,
+        status: str,
+        assigned_to: str | None = None,
+        resolution: str | None = None,
+    ) -> StaffReviewQueueItem | None:
+        if status not in STAFF_REVIEW_STATUSES:
+            raise ValueError("status must be one of: closed, in_review, open, resolved.")
+        if status in RESOLVED_STAFF_REVIEW_STATUSES and not resolution:
+            raise ValueError("resolution is required when resolving or closing a staff review item.")
+        current = self.get_staff_review_queue_item(review_id)
+        if current is None:
+            return None
+        updated = StaffReviewQueueItem(
+            review_id=current.review_id,
+            grant_id=current.grant_id,
+            opportunity_title=current.opportunity_title,
+            status=status,
+            reason=current.reason,
+            assigned_to=assigned_to,
+            resolution=resolution,
+            created_by=current.created_by,
+            created_at=current.created_at,
+            updated_at=datetime.now(UTC),
+        )
+        with self.engine.begin() as connection:
+            connection.execute(
+                staff_review_queue_records.update()
+                .where(staff_review_queue_records.c.review_id == review_id)
+                .values(**_staff_queue_values(updated))
+            )
+        return updated
+
+    def get_staff_review_queue_item(self, review_id: str) -> StaffReviewQueueItem | None:
+        with self.engine.begin() as connection:
+            row = connection.execute(
+                sa.select(staff_review_queue_records).where(
+                    staff_review_queue_records.c.review_id == review_id
+                )
+            ).mappings().first()
+        if row is None:
+            return None
+        return _row_to_staff_queue_item(row)
+
+    def staff_review_summary(self) -> StaffReviewSummary:
+        items = self.list_staff_review_queue_items()
+        by_status = {status: sum(1 for item in items if item.status == status) for status in STAFF_REVIEW_STATUSES}
+        return StaffReviewSummary(
+            total_items=len(items),
+            by_status=by_status,
+            open_items=sum(1 for item in items if item.status in OPEN_STAFF_REVIEW_STATUSES),
+            generated_at=datetime.now(UTC),
+        )
+
 
 def _normalize_key(value: str) -> str:
     return "-".join(value.strip().casefold().split())
@@ -197,4 +333,37 @@ def _row_to_compliance_calendar(row: object) -> StoredComplianceCalendar:
         calendar_items=tuple(data["calendar_items"]),
         staff_note=data["staff_note"],
         created_at=data["created_at"],
+    )
+
+
+def _staff_queue_values(item: StaffReviewQueueItem) -> dict[str, object]:
+    return {
+        "review_id": item.review_id,
+        "grant_id": item.grant_id,
+        "opportunity_title": item.opportunity_title,
+        "status": item.status,
+        "reason": item.reason,
+        "assigned_to": item.assigned_to,
+        "resolution": item.resolution,
+        "created_by": item.created_by,
+        "created_at": item.created_at,
+        "updated_at": item.updated_at,
+        "visibility": item.visibility,
+    }
+
+
+def _row_to_staff_queue_item(row: object) -> StaffReviewQueueItem:
+    data = dict(row)
+    return StaffReviewQueueItem(
+        review_id=data["review_id"],
+        grant_id=data["grant_id"],
+        opportunity_title=data["opportunity_title"],
+        status=data["status"],
+        reason=data["reason"],
+        assigned_to=data["assigned_to"],
+        resolution=data["resolution"],
+        created_by=data["created_by"],
+        created_at=data["created_at"],
+        updated_at=data["updated_at"],
+        visibility=data["visibility"],
     )
