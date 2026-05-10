@@ -31,7 +31,7 @@ Current state: **v0.2.0 grant support and staff review queue runtime**. This rep
 CivicGrants installs against the published CivicCore v1.0.0 release wheel:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0/civiccore-1.0.0-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl
 ```
 
 ## API Surface
