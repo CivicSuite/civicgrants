@@ -28,13 +28,13 @@ CivicGrants is a FastAPI Python package pinned to the published `civiccore v1.0.
 
 Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records. Set `CIVICGRANTS_STAFF_API_KEY` before using staff-only queue routes. Staff routes require:
 
-- `X-CivicGrants-Role: staff` or `service`
+- `X-CivicGrants-Role: staff`
 - `X-CivicGrants-Staff-Key: <configured key>`
 
 Run:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
 python -m pip install -e ".[dev]"
 python -m pytest -q
 bash scripts/verify-release.sh
