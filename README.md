@@ -31,7 +31,7 @@ Current state: **v0.2.0 grant support and staff review queue runtime**. This rep
 CivicGrants installs against the published CivicCore v1.0.0 release wheel:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
 ```
 
 ## API Surface
@@ -66,7 +66,7 @@ Set `CIVICGRANTS_STAFF_API_KEY` before using staff-only review routes:
 export CIVICGRANTS_STAFF_API_KEY="replace-with-city-secret"
 ```
 
-Staff routes require `X-CivicGrants-Role: staff` or `service` and `X-CivicGrants-Staff-Key` matching the configured key. Without persistence, CivicGrants remains deterministic and stateless. Retrieval and staff-only endpoints return actionable `503` responses that name the required configuration.
+Staff routes require `X-CivicGrants-Role: staff` and `X-CivicGrants-Staff-Key` matching the configured key. CivicGrants uses CivicCore `staff_key_gate` for timing-safe key comparison. Without persistence, CivicGrants remains deterministic and stateless. Retrieval and staff-only endpoints return actionable `503` responses that name the required configuration.
 
 ## Local Development
 
