@@ -15,7 +15,7 @@ Current state: **v0.2.0 grant support and staff review queue runtime**. This rep
 - Carry CivicRecords and grant-file context IDs into review-required packets without calling those systems live.
 - Validate adversarial local integration mocks for spoofed roles, official eligibility attempts, submission attempts, award-acceptance attempts, legal-advice claims, stale context, and live funder-feed claims.
 - Produce audit-ready export checklists for grant files.
-- Demonstrate a public grant-support UI at `/civicgrants`.
+- Demonstrate an API-backed public grant-support UI at `/civicgrants`.
 
 ## What CivicGrants Does Not Do
 

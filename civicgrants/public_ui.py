@@ -32,7 +32,8 @@ def render_public_lookup_page() -> str:
   p, li { line-height:1.65; }
   textarea, button { width:100%; border:1px solid #b9c6cc; border-radius:16px; padding:.85rem 1rem; font:inherit; }
   textarea { background:#f7f8f4; color:var(--ink); }
-  button { width:fit-content; min-width:190px; border:0; background:var(--blue); color:white; font-weight:900; cursor:default; }
+  button { width:fit-content; min-width:190px; border:0; background:var(--blue); color:white; font-weight:900; cursor:pointer; }
+  button:disabled { opacity:.65; cursor:wait; }
   .result { margin-top:18px; padding:18px; border-left:6px solid var(--green); border-radius:18px; background:white; }
   .warning { border-left-color:#b2603f; background:#fff8f4; }
   .kicker { color:var(--muted); font-size:.86rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
@@ -54,9 +55,10 @@ def render_public_lookup_page() -> str:
     <article class="card large">
       <p class="kicker">Sample opportunity triage</p>
       <h2 id="lookup-title">Water infrastructure grant</h2>
-      <textarea aria-label="Sample grant notes" rows="4">Opportunity supports water infrastructure, requires local match, and has quarterly reporting.</textarea>
-      <button type="button">Draft sample grant file</button>
-      <div class="result" role="status" aria-live="polite">
+      <label for="grant-notes">Grant need notes</label>
+      <textarea id="grant-notes" aria-label="Sample grant notes" rows="4">Opportunity supports water infrastructure, requires local match, and has quarterly reporting.</textarea>
+      <button id="draft-button" type="button">Draft sample grant file</button>
+      <div id="result" class="result" role="status" aria-live="polite">
         <h3>Staff review packet</h3>
         <ul><li>Recommended owner: Public Works.</li><li>Confirm eligibility and authorized signer.</li><li>Create reporting and closeout reminders.</li></ul>
       </div>
@@ -68,6 +70,77 @@ def render_public_lookup_page() -> str:
   </section>
 </main>
 <footer><p>CivicGrants is part of the Apache 2.0 CivicSuite open-source municipal AI project.</p></footer>
+<script>
+  const result = document.querySelector("#result");
+  const button = document.querySelector("#draft-button");
+  const notes = document.querySelector("#grant-notes");
+
+  function clearResult(kind) {
+    result.className = `result ${kind}`;
+    result.replaceChildren();
+  }
+
+  function appendText(tagName, text) {
+    const node = document.createElement(tagName);
+    node.textContent = text;
+    result.appendChild(node);
+    return node;
+  }
+
+  function setResult(kind, title, body) {
+    clearResult(kind);
+    appendText("h3", title);
+    appendText("p", body);
+  }
+
+  function renderOutline(payload) {
+    clearResult("");
+    appendText("h3", payload.heading || "Draft ready for staff review");
+    const sections = Array.isArray(payload.narrative_sections) ? payload.narrative_sections : [];
+    if (sections.length) {
+      const list = document.createElement("ul");
+      for (const section of sections) {
+        const item = document.createElement("li");
+        item.textContent = section;
+        list.appendChild(item);
+      }
+      result.appendChild(list);
+    }
+    appendText("p", payload.disclaimer || "Staff must verify every grant decision before official action.");
+  }
+
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    setResult("", "Drafting grant file", "Sending staff-entered notes to the local CivicGrants API.");
+    try {
+      const cityNeed = notes.value.trim();
+      if (!cityNeed) {
+        setResult("warning", "More detail is needed", "Add grant need notes before drafting a sample grant file.");
+        return;
+      }
+      const response = await fetch("/api/v1/civicgrants/applications/outline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          project_name: "Water infrastructure grant file",
+          opportunity_title: "Water infrastructure grant",
+          city_need: cityNeed
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        const detail = payload.detail || {};
+        setResult("warning", "Draft failed", detail.fix || detail.message || "Review the input and try again.");
+        return;
+      }
+      renderOutline(payload);
+    } catch {
+      setResult("warning", "Draft failed", "The local CivicGrants API did not respond. Check the runtime logs and try again.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>
 """

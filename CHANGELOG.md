@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Aligned the current CivicGrants runtime dependency and current-facing docs to the published CivicCore v1.2.0 release wheel.
+- Wired the public `/civicgrants` draft workflow to the local application-outline API and safe DOM rendering.
 
 ## [0.2.0] - 2026-05-11
 

@@ -4,7 +4,7 @@ CivicGrants User Manual
 For Non-Technical Users
 -----------------------
 
-CivicGrants helps city staff keep grant opportunities, eligibility notes, application outlines, reporting dates, staff review queues, CivicRecords context references, and audit files organized.
+CivicGrants helps city staff keep grant opportunities, eligibility notes, application outlines, reporting dates, staff review queues, CivicRecords context references, audit files, and an API-backed public sample UI organized.
 
 Current state: 0.2.0 grant support and staff review queue runtime. CivicGrants can optionally save grant opportunity, compliance-calendar, and staff review queue records when IT configures CIVICGRANTS_GRANT_DB_URL. Staff-only review routes also require CIVICGRANTS_STAFF_API_KEY.
 
