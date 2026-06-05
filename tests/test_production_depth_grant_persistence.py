@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import subprocess
+import sys
 
 from fastapi.testclient import TestClient
 
@@ -40,9 +42,56 @@ def test_repository_persists_seeded_triage_and_compliance_calendar(tmp_path: Pat
     db_path.unlink()
 
 
+def test_grant_repository_records_schema_status(tmp_path: Path) -> None:
+    db_path = tmp_path / "schema-status.db"
+    repository = GrantRecordsRepository(db_url=f"sqlite+pysqlite:///{db_path.as_posix()}", seed_defaults=False)
+    try:
+        status = repository.schema_status()
+        opportunities = repository.opportunity_record_count()
+    finally:
+        repository.engine.dispose()
+
+    assert status.ready is True
+    assert status.schema_version == status.expected_schema_version
+    assert status.missing_tables == ()
+    assert opportunities == 0
+
+
+def test_db_status_cli_reports_ready_schema(tmp_path: Path) -> None:
+    db_path = tmp_path / "cli-status.db"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "civicgrants.db_admin",
+            "--db-url",
+            f"sqlite+pysqlite:///{db_path.as_posix()}",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "CivicGrants schema ready" in result.stdout
+    assert "opportunities=0" in result.stdout
+
+
 def test_grant_persistence_api_round_trip(monkeypatch, tmp_path: Path) -> None:
     db_path = tmp_path / "civicgrants-api.db"
-    monkeypatch.setenv("CIVICGRANTS_GRANT_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}")
+    db_url = f"sqlite+pysqlite:///{db_path.as_posix()}"
+    repository = GrantRecordsRepository(db_url=db_url, seed_defaults=False)
+    repository.upsert_opportunity(
+        opportunity_key="water-infrastructure-grant",
+        opportunity_title="Water infrastructure grant",
+        funding_area="stormwater",
+        deadline="2026-06-01",
+        priority="high",
+        recommended_owner="Utilities",
+        triage_notes=("Local grant source loaded.",),
+        disclaimer="Grant support only.",
+    )
+    repository.engine.dispose()
+    monkeypatch.setenv("CIVICGRANTS_GRANT_DB_URL", db_url)
     _dispose_grant_repository()
 
     triage = client.post(
@@ -64,13 +113,103 @@ def test_grant_persistence_api_round_trip(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL")
 
     assert triage.status_code == 200
-    assert triage.json()["recommended_owner"] == "Public Works"
+    assert triage.json()["recommended_owner"] == "Utilities"
     assert created.status_code == 200
     assert compliance_id
     assert fetched.status_code == 200
     assert fetched.json()["award_name"] == "Water infrastructure grant"
     assert fetched.json()["reporting_frequency"] == "monthly"
     db_path.unlink()
+
+
+def test_configured_grant_database_does_not_seed_sample_opportunities(monkeypatch, tmp_path: Path) -> None:
+    db_path = tmp_path / "no-sample-seed.db"
+    db_url = f"sqlite+pysqlite:///{db_path.as_posix()}"
+    monkeypatch.setenv("CIVICGRANTS_GRANT_DB_URL", db_url)
+    _dispose_grant_repository()
+
+    try:
+        response = client.post(
+            "/api/v1/civicgrants/opportunities/triage",
+            json={
+                "opportunity_title": "Water infrastructure grant",
+                "funding_area": "stormwater",
+                "deadline": "2026-06-01",
+            },
+        )
+    finally:
+        _dispose_grant_repository()
+        monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL")
+
+    assert response.status_code == 200
+    assert response.json()["recommended_owner"] == "Public Works"
+    repository = GrantRecordsRepository(db_url=db_url, seed_defaults=False)
+    try:
+        assert repository.opportunity_record_count() == 0
+    finally:
+        repository.engine.dispose()
+
+
+def test_readiness_requires_configured_grant_database(monkeypatch) -> None:
+    monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL", raising=False)
+    _dispose_grant_repository()
+
+    response = client.get("/api/v1/civicgrants/readiness")
+
+    payload = response.json()
+    assert payload["status"] == "not-ready"
+    assert payload["ready"] is False
+    assert payload["grant_database_configured"] is False
+    assert "CIVICGRANTS_GRANT_DB_URL" in payload["blockers"][0]
+
+
+def test_readiness_requires_imported_local_opportunities(monkeypatch, tmp_path: Path) -> None:
+    db_path = tmp_path / "empty-ready.db"
+    monkeypatch.setenv("CIVICGRANTS_GRANT_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}")
+    _dispose_grant_repository()
+
+    try:
+        response = client.get("/ready")
+    finally:
+        _dispose_grant_repository()
+        monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL")
+
+    payload = response.json()
+    assert payload["status"] == "not-ready"
+    assert payload["schema_ready"] is True
+    assert payload["opportunity_count"] == 0
+    assert "Import local grant opportunity records" in payload["blockers"][0]
+
+
+def test_readiness_passes_with_loaded_local_opportunities(monkeypatch, tmp_path: Path) -> None:
+    db_path = tmp_path / "ready-runtime.db"
+    db_url = f"sqlite+pysqlite:///{db_path.as_posix()}"
+    repository = GrantRecordsRepository(db_url=db_url, seed_defaults=False)
+    repository.upsert_opportunity(
+        opportunity_key="water-infrastructure-grant",
+        opportunity_title="Water infrastructure grant",
+        funding_area="stormwater",
+        deadline="2026-06-01",
+        priority="high",
+        recommended_owner="Utilities",
+        triage_notes=("Local grant source loaded.",),
+        disclaimer="Grant support only.",
+    )
+    repository.engine.dispose()
+    monkeypatch.setenv("CIVICGRANTS_GRANT_DB_URL", db_url)
+    _dispose_grant_repository()
+
+    try:
+        response = client.get("/api/v1/civicgrants/readiness")
+    finally:
+        _dispose_grant_repository()
+        monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL")
+
+    payload = response.json()
+    assert payload["status"] == "ready"
+    assert payload["ready"] is True
+    assert payload["schema_ready"] is True
+    assert payload["opportunity_count"] == 1
 
 
 def test_application_outline_with_persistence_creates_staff_review_queue(monkeypatch, tmp_path: Path) -> None:

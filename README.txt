@@ -12,6 +12,8 @@ Staff routes require CIVICGRANTS_GRANT_DB_URL plus CIVICGRANTS_STAFF_API_KEY and
 - X-CivicGrants-Role: staff or service
 - X-CivicGrants-Staff-Key: configured staff key
 
+Use civicgrants-db-status to initialize/check schema, then load local opportunity CSV rows with civicgrants-import-opportunities. /ready remains not-ready until the grant database is configured and local opportunity records are loaded.
+
 Local development:
 
 python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl

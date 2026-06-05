@@ -12,6 +12,8 @@ CivicGrants is a FastAPI Python package pinned to the published `civiccore v1.2.
 
 - `GET /`
 - `GET /health`
+- `GET /ready`
+- `GET /api/v1/civicgrants/readiness`
 - `GET /civicgrants`
 - `POST /api/v1/civicgrants/opportunities/triage`
 - `POST /api/v1/civicgrants/eligibility/match`
@@ -26,10 +28,12 @@ CivicGrants is a FastAPI Python package pinned to the published `civiccore v1.2.
 - `GET /api/v1/civicgrants/staff/reviews/summary`
 - `POST /api/v1/civicgrants/export`
 
-Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records. Set `CIVICGRANTS_STAFF_API_KEY` before using staff-only queue routes. Staff routes require:
+Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records. Use `civicgrants-db-status` to initialize/check schema, then load local opportunity CSV rows with `civicgrants-import-opportunities`. Set `CIVICGRANTS_STAFF_API_KEY` before using staff-only queue routes. Staff routes require:
 
 - `X-CivicGrants-Role: staff`
 - `X-CivicGrants-Staff-Key: <configured key>`
+
+Required opportunity CSV columns are `opportunity_key`, `opportunity_title`, `funding_area`, `deadline`, `priority`, `recommended_owner`, and `triage_notes`. `/ready` and `/api/v1/civicgrants/readiness` remain not-ready until `CIVICGRANTS_GRANT_DB_URL` is configured and at least one local opportunity record is loaded.
 
 Run:
 

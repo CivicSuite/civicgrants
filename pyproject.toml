@@ -19,6 +19,10 @@ dependencies = [
   "uvicorn[standard]>=0.30.0,<1.0.0",
 ]
 
+[project.scripts]
+civicgrants-db-status = "civicgrants.db_admin:main"
+civicgrants-import-opportunities = "civicgrants.data_import:main"
+
 [tool.hatch.metadata]
 allow-direct-references = true
 

@@ -34,6 +34,8 @@ required=(
   "civicgrants/compliance_calendar.py"
   "civicgrants/audit_file.py"
   "civicgrants/integration_mocks.py"
+  "civicgrants/db_admin.py"
+  "civicgrants/data_import.py"
   "civicgrants/public_ui.py"
 )
 

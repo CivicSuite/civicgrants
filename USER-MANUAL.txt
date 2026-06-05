@@ -15,7 +15,7 @@ For IT and Technical Staff
 
 CivicGrants is a FastAPI Python package pinned to the published civiccore v1.2.0 release wheel. It exposes grant triage, eligibility, application outline, compliance calendar, grant-review context, adversarial local mock, staff review queue, and audit export endpoints.
 
-Set CIVICGRANTS_GRANT_DB_URL to enable local SQLAlchemy-backed grant records. Set CIVICGRANTS_STAFF_API_KEY before using staff-only queue routes.
+Set CIVICGRANTS_GRANT_DB_URL to enable local SQLAlchemy-backed grant records. Use civicgrants-db-status to initialize/check schema, then load local opportunity CSV rows with civicgrants-import-opportunities. Required opportunity CSV columns are opportunity_key, opportunity_title, funding_area, deadline, priority, recommended_owner, and triage_notes. /ready and /api/v1/civicgrants/readiness remain not-ready until CIVICGRANTS_GRANT_DB_URL is configured and at least one local opportunity record is loaded. Set CIVICGRANTS_STAFF_API_KEY before using staff-only queue routes.
 
 Run:
 

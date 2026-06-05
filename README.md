@@ -38,6 +38,8 @@ python -m pip install https://github.com/CivicSuite/civiccore/releases/download/
 
 - `GET /` returns the shipped/planned boundary.
 - `GET /health` returns package and CivicCore versions.
+- `GET /ready` returns local-data readiness for installer and operator checks.
+- `GET /api/v1/civicgrants/readiness` returns detailed schema and opportunity readiness.
 - `GET /civicgrants` returns the accessible public sample UI.
 - `POST /api/v1/civicgrants/opportunities/triage` returns sample opportunity triage.
 - `POST /api/v1/civicgrants/eligibility/match` returns staff-review eligibility factors.
@@ -54,7 +56,9 @@ python -m pip install https://github.com/CivicSuite/civiccore/releases/download/
 
 ## Optional Persistence And Staff Queue
 
-Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records:
+Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records. Use `civicgrants-db-status` to initialize/check schema, then load local opportunity CSV rows with `civicgrants-import-opportunities`. `/ready` remains not-ready until the grant database is configured and local opportunity records are loaded.
+
+Example local database configuration:
 
 ```bash
 export CIVICGRANTS_GRANT_DB_URL="sqlite+pysqlite:///./civicgrants.db"

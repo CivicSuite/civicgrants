@@ -12,6 +12,15 @@ from civicgrants.opportunity_triage import OpportunityTriage, triage_opportunity
 
 
 metadata = sa.MetaData()
+SCHEMA_VERSION = "2026-06-05-001"
+
+schema_migrations = sa.Table(
+    "schema_migrations",
+    metadata,
+    sa.Column("schema_version", sa.String(80), primary_key=True),
+    sa.Column("applied_at", sa.DateTime(timezone=True), nullable=False),
+    schema="civicgrants",
+)
 
 grant_opportunity_records = sa.Table(
     "grant_opportunity_records",
@@ -97,6 +106,15 @@ class StaffReviewSummary:
     visibility: str = "staff_only"
 
 
+@dataclass(frozen=True)
+class SchemaStatus:
+    schema_version: str | None
+    expected_schema_version: str
+    ready: bool
+    missing_tables: tuple[str, ...]
+    dialect: str
+
+
 class GrantRecordsRepository:
     """SQLAlchemy-backed grant opportunity and compliance-calendar records."""
 
@@ -108,9 +126,55 @@ class GrantRecordsRepository:
             self.engine = base_engine
             with self.engine.begin() as connection:
                 connection.execute(sa.text("CREATE SCHEMA IF NOT EXISTS civicgrants"))
-        metadata.create_all(self.engine)
+        self.migrate()
         if seed_defaults:
             self.seed_sample_opportunities()
+
+    def migrate(self) -> SchemaStatus:
+        """Apply non-destructive local schema setup and return the resulting status."""
+
+        metadata.create_all(self.engine)
+        with self.engine.begin() as connection:
+            exists = connection.execute(
+                sa.select(schema_migrations.c.schema_version).where(
+                    schema_migrations.c.schema_version == SCHEMA_VERSION
+                )
+            ).first()
+            if exists is None:
+                connection.execute(
+                    schema_migrations.insert().values(
+                        schema_version=SCHEMA_VERSION,
+                        applied_at=datetime.now(UTC),
+                    )
+                )
+        return self.schema_status()
+
+    def schema_status(self) -> SchemaStatus:
+        inspector = sa.inspect(self.engine)
+        translated_schema = None if self.engine.dialect.name == "sqlite" else "civicgrants"
+        available_tables = set(inspector.get_table_names(schema=translated_schema))
+        expected_tables = {
+            "grant_opportunity_records",
+            "grant_compliance_records",
+            "staff_review_queue_records",
+            "schema_migrations",
+        }
+        missing_tables = tuple(sorted(expected_tables - available_tables))
+        schema_version = None
+        if "schema_migrations" not in missing_tables:
+            with self.engine.begin() as connection:
+                schema_version = connection.execute(
+                    sa.select(schema_migrations.c.schema_version)
+                    .order_by(schema_migrations.c.applied_at.desc())
+                    .limit(1)
+                ).scalar_one_or_none()
+        return SchemaStatus(
+            schema_version=schema_version,
+            expected_schema_version=SCHEMA_VERSION,
+            ready=schema_version == SCHEMA_VERSION and not missing_tables,
+            missing_tables=missing_tables,
+            dialect=self.engine.dialect.name,
+        )
 
     def seed_sample_opportunities(self) -> None:
         now = datetime.now(UTC)
@@ -156,6 +220,62 @@ class GrantRecordsRepository:
                         updated_at=now,
                     )
                 )
+
+    def upsert_opportunity(
+        self,
+        *,
+        opportunity_key: str,
+        opportunity_title: str,
+        funding_area: str,
+        deadline: str,
+        priority: str,
+        recommended_owner: str,
+        triage_notes: tuple[str, ...],
+        disclaimer: str,
+    ) -> None:
+        normalized_key = _normalize_key(opportunity_key)
+        if normalized_key == "":
+            raise ValueError("opportunity_key is required.")
+        if not triage_notes:
+            raise ValueError("triage_notes must include at least one note.")
+        now = datetime.now(UTC)
+        values = {
+            "opportunity_title": opportunity_title.strip(),
+            "funding_area": funding_area.strip(),
+            "deadline": deadline.strip() or "confirm in source notice",
+            "priority": priority.strip() or "staff-review",
+            "recommended_owner": recommended_owner.strip(),
+            "triage_notes": list(triage_notes),
+            "disclaimer": disclaimer.strip(),
+            "updated_at": now,
+        }
+        for field in ["opportunity_title", "funding_area", "recommended_owner", "disclaimer"]:
+            if values[field] == "":
+                raise ValueError(f"{field} is required.")
+        with self.engine.begin() as connection:
+            exists = connection.execute(
+                sa.select(grant_opportunity_records.c.opportunity_key).where(
+                    grant_opportunity_records.c.opportunity_key == normalized_key
+                )
+            ).first()
+            if exists is None:
+                connection.execute(
+                    grant_opportunity_records.insert().values(
+                        opportunity_key=normalized_key,
+                        created_at=now,
+                        **values,
+                    )
+                )
+            else:
+                connection.execute(
+                    grant_opportunity_records.update()
+                    .where(grant_opportunity_records.c.opportunity_key == normalized_key)
+                    .values(**values)
+                )
+
+    def opportunity_record_count(self) -> int:
+        with self.engine.begin() as connection:
+            return connection.execute(sa.select(sa.func.count()).select_from(grant_opportunity_records)).scalar_one()
 
     def triage_opportunity(
         self, *, opportunity_title: str, funding_area: str, deadline: str = ""

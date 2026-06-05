@@ -111,11 +111,14 @@ def root() -> dict[str, str]:
             "application outline helper, compliance calendar helper, optional database-backed grant "
             "opportunity and compliance records, staff review queues, review-required CivicRecords grant "
             "context packets, adversarial local integration mocks, audit-ready export checklist, and public "
-            "UI foundation are online; live funder feeds, official eligibility decisions, legal advice, "
-            "live LLM calls, submission portals, award acceptance, and grant system-of-record integrations "
-            "are not implemented."
+            "UI foundation are online with readiness checks; live funder feeds, official eligibility "
+            "decisions, legal advice, live LLM calls, submission portals, award acceptance, and grant "
+            "system-of-record integrations are not implemented."
         ),
-        "next_step": "Configure CIVICGRANTS_GRANT_DB_URL and CIVICGRANTS_STAFF_API_KEY before using staff queues.",
+        "next_step": (
+            "Configure CIVICGRANTS_GRANT_DB_URL, import local grant opportunities, and verify "
+            "/ready before public use."
+        ),
     }
 
 
@@ -129,6 +132,20 @@ def health() -> dict[str, str]:
         "version": __version__,
         "civiccore_version": CIVICCORE_VERSION,
     }
+
+
+@app.get("/ready")
+def ready() -> dict[str, object]:
+    """Return public-use readiness without treating sample fallback as customer data."""
+
+    return _readiness_payload()
+
+
+@app.get("/api/v1/civicgrants/readiness")
+def readiness() -> dict[str, object]:
+    """Return detailed CivicGrants local-data readiness for installers and operators."""
+
+    return _readiness_payload()
 
 
 @app.get("/civicgrants", response_class=HTMLResponse)
@@ -356,7 +373,7 @@ def _get_grant_repository() -> GrantRecordsRepository:
     if _grant_repository is None or db_url != _grant_db_url:
         _dispose_grant_repository()
         _grant_db_url = db_url
-        _grant_repository = GrantRecordsRepository(db_url=db_url)
+        _grant_repository = GrantRecordsRepository(db_url=db_url, seed_defaults=False)
     return _grant_repository
 
 
@@ -430,4 +447,39 @@ def _staff_review_summary_payload(summary: StaffReviewSummary) -> dict[str, obje
         "open_items": summary.open_items,
         "generated_at": summary.generated_at.isoformat(),
         "visibility": summary.visibility,
+    }
+
+
+def _readiness_payload() -> dict[str, object]:
+    db_url = _grant_database_url()
+    if db_url is None:
+        return {
+            "status": "not-ready",
+            "ready": False,
+            "grant_database_configured": False,
+            "schema_ready": False,
+            "schema_version": None,
+            "expected_schema_version": None,
+            "opportunity_count": 0,
+            "blockers": ["Set CIVICGRANTS_GRANT_DB_URL to a local grant database."],
+        }
+
+    repository = _get_grant_repository()
+    schema_status = repository.schema_status()
+    opportunity_count = repository.opportunity_record_count()
+    blockers: list[str] = []
+    if not schema_status.ready:
+        blockers.append("Initialize the CivicGrants database schema with civicgrants-db-status.")
+    if opportunity_count == 0:
+        blockers.append("Import local grant opportunity records with civicgrants-import-opportunities.")
+    ready_for_public_use = not blockers
+    return {
+        "status": "ready" if ready_for_public_use else "not-ready",
+        "ready": ready_for_public_use,
+        "grant_database_configured": True,
+        "schema_ready": schema_status.ready,
+        "schema_version": schema_status.schema_version,
+        "expected_schema_version": schema_status.expected_schema_version,
+        "opportunity_count": opportunity_count,
+        "blockers": blockers,
     }
