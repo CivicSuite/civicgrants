@@ -1,0 +1,87 @@
+{
+  "generated_at": "2026-06-05T22:53:24.146Z",
+  "base": "http://127.0.0.1:18170",
+  "checks": [
+    {
+      "name": "public-desktop",
+      "status": 200,
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "heading": "Draft application outline for Water infrastructure grant file",
+      "itemCount": 5,
+      "resultText": "Draft application outline for Water infrastructure grant file\nOpportunity fit: Water infrastructure grant.\nNeed statement source: Opportunity supports water infrastructure, requires local match, and has quarterly reporting.\nProject scope and work plan.\nBudget, match, and sustainability plan.\nPerformance measures and reporting approach.\n\nCivicGrants provides grant-support drafts only. Staff own every decision; the module does not determine eligibility, submit applications, or replace the grant system of record.",
+      "overflow": false,
+      "consoleMessages": [],
+      "requestFailures": [],
+      "screenshot": "C:/dev/Claude/civicgrants/docs/qa/civicgrants-stage-2026-06-05/public-desktop.png"
+    },
+    {
+      "name": "public-mobile",
+      "status": 200,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "heading": "Draft application outline for Water infrastructure grant file",
+      "itemCount": 5,
+      "resultText": "Draft application outline for Water infrastructure grant file\nOpportunity fit: Water infrastructure grant.\nNeed statement source: Opportunity supports water infrastructure, requires local match, and has quarterly reporting.\nProject scope and work plan.\nBudget, match, and sustainability plan.\nPerformance measures and reporting approach.\n\nCivicGrants provides grant-support drafts only. Staff own every decision; the module does not determine eligibility, submit applications, or replace the grant system of record.",
+      "overflow": false,
+      "consoleMessages": [],
+      "requestFailures": [],
+      "screenshot": "C:/dev/Claude/civicgrants/docs/qa/civicgrants-stage-2026-06-05/public-mobile.png"
+    },
+    {
+      "name": "api-/",
+      "status": 200,
+      "body": "{\"name\":\"CivicGrants\",\"version\":\"0.2.0\",\"status\":\"grant support foundation plus grant persistence\",\"message\":\"CivicGrants package, API foundation, sample opportunity triage, eligibility matching, application outline helper, compliance calendar helper, optional database-backed grant opportunity and compliance records, staff review queues, review-required CivicRecords grant context packets, adversarial local integration mocks, audit-ready export checklist, and public UI foundation are online with readiness checks; live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, award acceptance, and grant system-of-record integrations are not implemented.\",\"next_step\":\"Configure CIVICGRANTS_GRANT_DB_URL, import local grant opportunities, and verify /ready before public use.\"}"
+    },
+    {
+      "name": "api-/health",
+      "status": 200,
+      "body": "{\"status\":\"ok\",\"service\":\"civicgrants\",\"version\":\"0.2.0\",\"civiccore_version\":\"1.2.0\"}"
+    },
+    {
+      "name": "api-/ready",
+      "status": 200,
+      "body": "{\"status\":\"not-ready\",\"ready\":false,\"grant_database_configured\":false,\"schema_ready\":false,\"schema_version\":null,\"expected_schema_version\":null,\"opportunity_count\":0,\"blockers\":[\"Set CIVICGRANTS_GRANT_DB_URL to a local grant database.\"]}"
+    },
+    {
+      "name": "api-/api/v1/civicgrants/readiness",
+      "status": 200,
+      "body": "{\"status\":\"not-ready\",\"ready\":false,\"grant_database_configured\":false,\"schema_ready\":false,\"schema_version\":null,\"expected_schema_version\":null,\"opportunity_count\":0,\"blockers\":[\"Set CIVICGRANTS_GRANT_DB_URL to a local grant database.\"]}"
+    },
+    {
+      "name": "api-outline-valid",
+      "status": 200,
+      "body": {
+        "project_name": "Stage grant file",
+        "heading": "Draft application outline for Stage grant file",
+        "narrative_sections": [
+          "Opportunity fit: Water infrastructure grant.",
+          "Need statement source: Flooding affects three blocks.",
+          "Project scope and work plan.",
+          "Budget, match, and sustainability plan.",
+          "Performance measures and reporting approach."
+        ],
+        "staff_review_required": true,
+        "disclaimer": "CivicGrants provides grant-support drafts only. Staff own every decision; the module does not determine eligibility, submit applications, or replace the grant system of record.",
+        "staff_review_id": null
+      }
+    },
+    {
+      "name": "api-outline-invalid",
+      "status": 422,
+      "body": {
+        "detail": {
+          "message": "CivicGrants could not validate: city_need.",
+          "fix": "Send a JSON body with the required field names listed in the fields array. Keep text fields within documented bounds and use booleans for yes/no inputs.",
+          "fields": [
+            "city_need"
+          ]
+        }
+      }
+    }
+  ]
+}
