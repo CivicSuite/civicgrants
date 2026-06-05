@@ -102,6 +102,27 @@ def test_grant_support_apis_success_shape() -> None:
     assert export.json()["grant_id"] == "grant-2026-001"
 
 
+def test_application_outline_validation_is_actionable() -> None:
+    missing = client.post(
+        "/api/v1/civicgrants/applications/outline",
+        json={"project_name": "North basin stormwater retrofit", "opportunity_title": "Water grant"},
+    )
+    oversized = client.post(
+        "/api/v1/civicgrants/applications/outline",
+        json={
+            "project_name": "North basin stormwater retrofit",
+            "opportunity_title": "Water grant",
+            "city_need": "x" * 8001,
+        },
+    )
+
+    assert missing.status_code == 422
+    assert missing.json()["detail"]["fields"] == ["city_need"]
+    assert "required field names" in missing.json()["detail"]["fix"]
+    assert oversized.status_code == 422
+    assert oversized.json()["detail"]["fields"] == ["city_need"]
+
+
 def test_public_ui_route_is_accessible_and_honest() -> None:
     response = client.get("/civicgrants")
     assert response.status_code == 200

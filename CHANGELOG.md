@@ -5,6 +5,7 @@
 - Aligned the current CivicGrants runtime dependency and current-facing docs to the published CivicCore v1.2.0 release wheel.
 - Wired the public `/civicgrants` draft workflow to the local application-outline API and safe DOM rendering.
 - Added schema status, local opportunity import, and readiness gates that do not treat sample fallback as customer data.
+- Added bounded API request validation with actionable 422 responses.
 
 ## [0.2.0] - 2026-05-11
 

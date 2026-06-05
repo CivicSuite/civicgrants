@@ -5,8 +5,9 @@ import os
 from civiccore import __version__ as CIVICCORE_VERSION
 from civiccore.auth import staff_key_gate
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import HTMLResponse, JSONResponse
+from pydantic import BaseModel, Field
 
 from civicgrants import __version__
 from civicgrants.application_draft import draft_application_outline
@@ -36,66 +37,66 @@ _require_staff_key = staff_key_gate("CIVICGRANTS_STAFF_API_KEY", "X-CivicGrants-
 
 
 class OpportunityTriageRequest(BaseModel):
-    opportunity_title: str
-    funding_area: str
-    deadline: str = ""
+    opportunity_title: str = Field(..., min_length=1, max_length=500)
+    funding_area: str = Field(..., min_length=1, max_length=255)
+    deadline: str = Field(default="", max_length=120)
 
 
 class EligibilityRequest(BaseModel):
-    city_profile: str
-    opportunity_title: str
-    funding_area: str
+    city_profile: str = Field(..., min_length=1, max_length=8000)
+    opportunity_title: str = Field(..., min_length=1, max_length=500)
+    funding_area: str = Field(..., min_length=1, max_length=255)
 
 
 class ApplicationOutlineRequest(BaseModel):
-    project_name: str
-    opportunity_title: str
-    city_need: str
-    grant_id: str | None = None
+    project_name: str = Field(..., min_length=1, max_length=500)
+    opportunity_title: str = Field(..., min_length=1, max_length=500)
+    city_need: str = Field(..., min_length=1, max_length=8000)
+    grant_id: str | None = Field(default=None, max_length=255)
 
 
 class ComplianceCalendarRequest(BaseModel):
-    award_name: str
-    reporting_frequency: str = "quarterly"
+    award_name: str = Field(..., min_length=1, max_length=500)
+    reporting_frequency: str = Field(default="quarterly", max_length=120)
 
 
 class AuditFileRequest(BaseModel):
-    grant_id: str
-    title: str
-    format: str = "markdown"
+    grant_id: str = Field(..., min_length=1, max_length=255)
+    title: str = Field(..., min_length=1, max_length=500)
+    format: str = Field(default="markdown", max_length=40)
 
 
 class GrantContextRequest(BaseModel):
-    grant_id: str
-    opportunity_title: str
-    records_context_id: str = ""
-    grant_file_context_id: str = ""
-    source_date_status: str = "current"
+    grant_id: str = Field(..., min_length=1, max_length=255)
+    opportunity_title: str = Field(..., min_length=1, max_length=500)
+    records_context_id: str = Field(default="", max_length=255)
+    grant_file_context_id: str = Field(default="", max_length=255)
+    source_date_status: str = Field(default="current", max_length=80)
 
 
 class IntegrationMockRequest(BaseModel):
-    scenario: str = "grant-context"
-    role: str = "staff"
-    records_context_id: str = ""
-    grant_file_context_id: str = ""
+    scenario: str = Field(default="grant-context", max_length=160)
+    role: str = Field(default="staff", max_length=80)
+    records_context_id: str = Field(default="", max_length=255)
+    grant_file_context_id: str = Field(default="", max_length=255)
     official_eligibility: bool = False
     application_submitted: bool = False
     award_accepted: bool = False
     legal_advice: bool = False
-    funder_feed_source: str = "local"
-    source_date_status: str = "current"
+    funder_feed_source: str = Field(default="local", max_length=160)
+    source_date_status: str = Field(default="current", max_length=80)
 
 
 class StaffReviewCreateRequest(BaseModel):
-    opportunity_title: str
-    reason: str
-    grant_id: str | None = None
+    opportunity_title: str = Field(..., min_length=1, max_length=500)
+    reason: str = Field(..., min_length=1, max_length=1000)
+    grant_id: str | None = Field(default=None, max_length=255)
 
 
 class StaffReviewUpdateRequest(BaseModel):
-    status: str
-    assigned_to: str | None = None
-    resolution: str | None = None
+    status: str = Field(..., min_length=1, max_length=120)
+    assigned_to: str | None = Field(default=None, max_length=255)
+    resolution: str | None = Field(default=None, max_length=2000)
 
 
 @app.get("/")
@@ -359,6 +360,31 @@ def staff_review_summary(
 ) -> dict[str, object]:
     _require_persistence_configured()
     return _staff_review_summary_payload(_get_grant_repository().staff_review_summary())
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_request: object, exc: RequestValidationError) -> JSONResponse:
+    fields = sorted(
+        {
+            str(error["loc"][-1])
+            for error in exc.errors()
+            if error.get("loc") and error["loc"][0] in {"body", "query", "path"}
+        }
+    )
+    field_text = ", ".join(fields) if fields else "request"
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": {
+                "message": f"CivicGrants could not validate: {field_text}.",
+                "fix": (
+                    "Send a JSON body with the required field names listed in the fields array. "
+                    "Keep text fields within documented bounds and use booleans for yes/no inputs."
+                ),
+                "fields": fields,
+            }
+        },
+    )
 
 
 def _grant_database_url() -> str | None:
