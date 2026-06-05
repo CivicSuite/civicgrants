@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Aligned the current CivicGrants runtime dependency and current-facing docs to the published CivicCore v1.2.0 release wheel.
+
 ## [0.2.0] - 2026-05-11
 
 ### Changed

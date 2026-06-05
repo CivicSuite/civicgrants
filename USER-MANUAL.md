@@ -8,7 +8,7 @@ Current state: 0.2.0 grant support and staff review queue runtime. CivicGrants c
 
 ## For IT and Technical Staff
 
-CivicGrants is a FastAPI Python package pinned to the published `civiccore v1.0.0` release wheel. The current runtime exposes:
+CivicGrants is a FastAPI Python package pinned to the published `civiccore v1.2.0` release wheel. The current runtime exposes:
 
 - `GET /`
 - `GET /health`
@@ -34,7 +34,7 @@ Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records. 
 Run:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl
 python -m pip install -e ".[dev]"
 python -m pytest -q
 bash scripts/verify-release.sh
@@ -45,7 +45,7 @@ bash scripts/verify-release.sh
 ```mermaid
 flowchart LR
   Staff["Grant staff / finance / administration"] --> CivicGrants["CivicGrants v0.2.0"]
-  CivicGrants --> CivicCore["CivicCore v1.0.0"]
+  CivicGrants --> CivicCore["CivicCore v1.2.0"]
   CivicGrants -. released context ID .-> CivicRecords["CivicRecords AI"]
   CivicGrants --> Queue["Staff review queue"]
   CivicGrants --> Export["Audit-ready grant file export"]

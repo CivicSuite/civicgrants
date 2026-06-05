@@ -1,6 +1,6 @@
 # Browser QA: Production Depth Grant Persistence
 
-URL: file:///C:/Users/scott/OneDrive/Desktop/Claude/civicgrants/docs/index.html
+URL: docs/index.html
 
 ## Results
 

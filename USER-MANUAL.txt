@@ -13,13 +13,13 @@ CivicGrants does not provide official eligibility decisions, legal advice, live 
 For IT and Technical Staff
 --------------------------
 
-CivicGrants is a FastAPI Python package pinned to the published civiccore v1.0.0 release wheel. It exposes grant triage, eligibility, application outline, compliance calendar, grant-review context, adversarial local mock, staff review queue, and audit export endpoints.
+CivicGrants is a FastAPI Python package pinned to the published civiccore v1.2.0 release wheel. It exposes grant triage, eligibility, application outline, compliance calendar, grant-review context, adversarial local mock, staff review queue, and audit export endpoints.
 
 Set CIVICGRANTS_GRANT_DB_URL to enable local SQLAlchemy-backed grant records. Set CIVICGRANTS_STAFF_API_KEY before using staff-only queue routes.
 
 Run:
 
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0/civiccore-1.0.0-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl
 python -m pip install -e ".[dev]"
 python -m pytest -q
 bash scripts/verify-release.sh

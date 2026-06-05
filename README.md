@@ -2,7 +2,7 @@
 
 CivicGrants is the CivicSuite module for grant opportunity triage, eligibility-factor matching, application outline support, compliance-calendar scaffolding, staff review queues, review-required CivicRecords grant context packets, adversarial local integration mocks, and audit-ready grant files.
 
-Current state: **v0.2.0 grant support and staff review queue runtime**. This repo ships a FastAPI package aligned to the published CivicCore v1.0.0 release wheel, health/root endpoints, documentation gates, deterministic and database-backed grant opportunity triage, compliance-calendar records, staff-only review queue workflows, review-required CivicRecords/grant-file context packets, adversarial local integration mocks, application outline helper, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, award acceptance, or grant system-of-record integrations.
+Current state: **v0.2.0 grant support and staff review queue runtime**. This repo ships a FastAPI package aligned to the published CivicCore v1.2.0 release wheel, health/root endpoints, documentation gates, deterministic and database-backed grant opportunity triage, compliance-calendar records, staff-only review queue workflows, review-required CivicRecords/grant-file context packets, adversarial local integration mocks, application outline helper, audit-ready export checklist, and accessible public sample UI at `/civicgrants`. It does **not** ship live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, award acceptance, or grant system-of-record integrations.
 
 ## What CivicGrants Does
 
@@ -28,10 +28,10 @@ Current state: **v0.2.0 grant support and staff review queue runtime**. This rep
 
 ## CivicCore Dependency
 
-CivicGrants installs against the published CivicCore v1.0.0 release wheel:
+CivicGrants installs against the published CivicCore v1.2.0 release wheel:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl
 ```
 
 ## API Surface

@@ -22,7 +22,7 @@ def test_pyproject_uses_published_civiccore_release_wheel() -> None:
     assert data["tool"]["hatch"]["metadata"]["allow-direct-references"] is True
     assert (
         "civiccore @ https://github.com/CivicSuite/civiccore/releases/download/"
-        "v1.1.0/civiccore-1.1.0-py3-none-any.whl#sha256=3ab146f4fea2ae99640d5b1b013be1a9676de5f91b783eaeaa913043a2ae2b87"
+        "v1.2.0/civiccore-1.2.0-py3-none-any.whl#sha256=a94ce958e36fb03c8d961e4db4672ce5bcfa25765c57d75886e999cf15703ec7"
     ) in dependencies
     assert "civiccore==1.0.0" not in dependencies
 
@@ -50,7 +50,7 @@ def test_health_endpoint_reports_versions() -> None:
     assert payload["status"] == "ok"
     assert payload["service"] == "civicgrants"
     assert payload["version"] == "0.2.0"
-    assert payload["civiccore_version"] == "1.1.0"
+    assert payload["civiccore_version"] == "1.2.0"
 
 
 def test_release_gate_prefers_native_unix_python_before_windows_launcher() -> None:
