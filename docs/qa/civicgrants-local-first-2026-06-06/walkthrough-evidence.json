@@ -1,0 +1,158 @@
+{
+  "baseUrl": "http://127.0.0.1:18162",
+  "checks": [
+    {
+      "name": "public-ui-draft-click",
+      "status": "ok",
+      "text": "Draft application outline for Water infrastructure grant file\nOpportunity fit: Water infrastructure grant.\nNeed statement source: Opportunity supports water infrastructure, requires local match, and has quarterly reporting.\nProject scope and work plan.\nBudget, match, and sustainability plan.\nPerformance measures and reporting approach.\n\nCivicGrants provides grant-support drafts only. Staff own every decision; the module does not determine eligibility, submit applications, or replace the grant system of record."
+    },
+    {
+      "name": "staff-ui-keyless-error-state",
+      "status": "ok",
+      "text": "Set CIVICGRANTS_STAFF_API_KEY before using staff-only routes."
+    },
+    {
+      "name": "root",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "name": "CivicGrants",
+        "version": "0.2.0",
+        "status": "local-first grant support plus staff review queues",
+        "message": "CivicGrants package, API foundation, sample opportunity triage, eligibility matching, application outline helper, compliance calendar helper, local-first database-backed grant opportunity and compliance records, staff review queues, review-required CivicRecords grant context packets, adversarial local integration mocks, audit-ready export checklist, and public UI foundation are online with readiness checks; live funder feeds, official eligibility decisions, legal advice, live LLM calls, submission portals, award acceptance, and grant system-of-record integrations are not implemented.",
+        "next_step": "Open /civicgrants/staff for staff review queues, verify /ready, and route grant file exports to CivicRecords before official action."
+      }
+    },
+    {
+      "name": "ready",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "status": "ready",
+        "ready": true,
+        "grant_database_configured": true,
+        "grant_database_url": "sqlite+pysqlite:///C:/dev/Claude/civicgrants/.tmp-walkthrough-data/civicgrants-records.db",
+        "using_default_local_database": true,
+        "schema_ready": true,
+        "schema_version": "2026-06-05-001",
+        "expected_schema_version": "2026-06-05-001",
+        "opportunity_count": 2,
+        "blockers": []
+      }
+    },
+    {
+      "name": "integration-contracts",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "module": "civicgrants",
+        "version": "0.2.0",
+        "contracts": [
+          {
+            "name": "civicgrants.opportunity_triage.v1",
+            "endpoint": "/api/v1/civicgrants/opportunities/triage",
+            "method": "POST",
+            "boundary": "Staff must verify funder source notices before official eligibility decisions."
+          },
+          {
+            "name": "civicgrants.application_outline.v1",
+            "endpoint": "/api/v1/civicgrants/applications/outline",
+            "method": "POST",
+            "boundary": "Creates a draft outline and staff review item; it does not submit applications."
+          },
+          {
+            "name": "civicgrants.staff_review_queue.v1",
+            "endpoint": "/api/v1/civicgrants/staff/reviews",
+            "method": "GET",
+            "requires_staff_key": true,
+            "boundary": "Staff-only review queue for grant decisions and follow-up."
+          },
+          {
+            "name": "civicgrants.audit_file_export.v1",
+            "endpoint": "/api/v1/civicgrants/export",
+            "method": "POST",
+            "target": "civicrecords-ai",
+            "boundary": "Builds a records-ready checklist; it does not write a system of record."
+          }
+        ],
+        "downstream_ready_for": [
+          "civicaccess public opportunity notices",
+          "civicprocure grant-funded procurement packages",
+          "civicrecords-ai grant file retention"
+        ]
+      }
+    },
+    {
+      "name": "outline",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "project_name": "Walkthrough project",
+        "heading": "Draft application outline for Walkthrough project",
+        "narrative_sections": [
+          "Opportunity fit: Water infrastructure grant.",
+          "Need statement source: Walkthrough city need.",
+          "Project scope and work plan.",
+          "Budget, match, and sustainability plan.",
+          "Performance measures and reporting approach."
+        ],
+        "staff_review_required": true,
+        "disclaimer": "CivicGrants provides grant-support drafts only. Staff own every decision; the module does not determine eligibility, submit applications, or replace the grant system of record.",
+        "staff_review_id": "965d731b-17a1-4c86-b40f-277c962196e6"
+      }
+    },
+    {
+      "name": "compliance-create",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "compliance_id": "2bbaad7b-b1c1-4477-88f6-14372b9435aa",
+        "award_name": "Walkthrough water award",
+        "reporting_frequency": "monthly",
+        "calendar_items": [
+          "Record award agreement execution date.",
+          "Create monthly programmatic reporting reminders.",
+          "Create monthly financial reporting reminders.",
+          "Schedule closeout package review before final reimbursement request."
+        ],
+        "staff_note": "Staff must verify actual deadlines against the executed award agreement.",
+        "created_at": "2026-06-06T20:14:22.776646+00:00"
+      }
+    },
+    {
+      "name": "compliance-fetch",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "compliance_id": "2bbaad7b-b1c1-4477-88f6-14372b9435aa",
+        "award_name": "Walkthrough water award",
+        "reporting_frequency": "monthly",
+        "calendar_items": [
+          "Record award agreement execution date.",
+          "Create monthly programmatic reporting reminders.",
+          "Create monthly financial reporting reminders.",
+          "Schedule closeout package review before final reimbursement request."
+        ],
+        "staff_note": "Staff must verify actual deadlines against the executed award agreement.",
+        "created_at": "2026-06-06T20:14:22.776646"
+      }
+    },
+    {
+      "name": "export",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "grant_id": "walkthrough-grant",
+        "title": "Walkthrough grant file",
+        "format": "markdown",
+        "checklist": [
+          "Preserve source opportunity notice and eligibility review notes.",
+          "Preserve governing-body authorization and signer records.",
+          "Preserve application drafts, final submission, award agreement, and budget.",
+          "Preserve reporting calendar, submitted reports, reimbursements, and closeout documents."
+        ],
+        "retention_note": "Keep grant records according to municipal retention schedule and award terms."
+      }
+    }
+  ]
+}
