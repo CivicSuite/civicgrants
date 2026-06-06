@@ -2,9 +2,9 @@
 
 ## For Non-Technical Users
 
-CivicGrants helps city staff keep grant opportunities, eligibility notes, application outlines, reporting dates, staff review queues, CivicRecords context references, and audit files organized. It can triage an opportunity, show eligibility factors for staff verification, draft an application outline, build a compliance-calendar scaffold, preserve review-required grant file context, and expose an API-backed public sample UI.
+CivicGrants helps city staff keep grant opportunities, eligibility notes, application outlines, reporting dates, staff review queues, CivicRecords context references, and audit files organized. It can triage an opportunity, show eligibility factors for staff verification, draft an application outline, build a compliance-calendar scaffold, preserve review-required grant file context, and expose API-backed public and staff UIs.
 
-Current state: 0.2.0 grant support and staff review queue runtime. CivicGrants can optionally save grant opportunity, compliance-calendar, and staff review queue records when IT configures `CIVICGRANTS_GRANT_DB_URL`. Staff-only review routes also require `CIVICGRANTS_STAFF_API_KEY`. CivicGrants does not provide official eligibility decisions, legal advice, live funder feeds, live LLM calls, submission portals, award acceptance, or grant system-of-record updates. Staff own every decision.
+Current state: 0.2.0 local-first grant support and staff review queue runtime. CivicGrants saves grant opportunity, compliance-calendar, and staff review queue records in a default local SQLite database unless IT configures `CIVICGRANTS_GRANT_DB_URL` for an explicit database. Staff-only review routes also require `CIVICGRANTS_STAFF_API_KEY`. CivicGrants does not provide official eligibility decisions, legal advice, live funder feeds, live LLM calls, submission portals, award acceptance, or grant system-of-record updates. Staff own every decision.
 
 ## For IT and Technical Staff
 
@@ -15,6 +15,8 @@ CivicGrants is a FastAPI Python package pinned to the published `civiccore v1.2.
 - `GET /ready`
 - `GET /api/v1/civicgrants/readiness`
 - `GET /civicgrants`
+- `GET /civicgrants/staff`
+- `GET /api/v1/civicgrants/integration-contracts`
 - `POST /api/v1/civicgrants/opportunities/triage`
 - `POST /api/v1/civicgrants/eligibility/match`
 - `POST /api/v1/civicgrants/applications/outline`
@@ -28,12 +30,12 @@ CivicGrants is a FastAPI Python package pinned to the published `civiccore v1.2.
 - `GET /api/v1/civicgrants/staff/reviews/summary`
 - `POST /api/v1/civicgrants/export`
 
-Set `CIVICGRANTS_GRANT_DB_URL` to enable local SQLAlchemy-backed grant records. Use `civicgrants-db-status` to initialize/check schema, then load local opportunity CSV rows with `civicgrants-import-opportunities`. Set `CIVICGRANTS_STAFF_API_KEY` before using staff-only queue routes. Staff routes require:
+CivicGrants uses `CIVICGRANTS_DATA_DIR` for its default local SQLite-backed grant records, or `CIVICGRANTS_GRANT_DB_URL` when IT needs an explicit SQLAlchemy database URL. The default local database seeds starter opportunity records so `/ready` and `/api/v1/civicgrants/readiness` can pass on a clerk-first installation. Use `civicgrants-db-status` to initialize/check an explicit schema, then load local opportunity CSV rows with `civicgrants-import-opportunities` when replacing starter records. Set `CIVICGRANTS_STAFF_API_KEY` before using staff-only queue routes. Staff routes require:
 
 - `X-CivicGrants-Role: staff`
 - `X-CivicGrants-Staff-Key: <configured key>`
 
-Required opportunity CSV columns are `opportunity_key`, `opportunity_title`, `funding_area`, `deadline`, `priority`, `recommended_owner`, and `triage_notes`. `/ready` and `/api/v1/civicgrants/readiness` remain not-ready until `CIVICGRANTS_GRANT_DB_URL` is configured and at least one local opportunity record is loaded.
+Required opportunity CSV columns are `opportunity_key`, `opportunity_title`, `funding_area`, `deadline`, `priority`, `recommended_owner`, and `triage_notes`. Explicit non-default databases remain not-ready until at least one local opportunity record is loaded.
 
 Run:
 
@@ -55,4 +57,4 @@ flowchart LR
   CivicGrants --> Export["Audit-ready grant file export"]
 ```
 
-CivicGrants depends on CivicCore. CivicCore does not depend on CivicGrants. CivicGrants v0.2.0 uses deterministic sample data plus optional staff-gated persistence, review-required context packets for CivicRecords/grant-file references, staff review queue records, and adversarial local mocks for integration-depth validation.
+CivicGrants depends on CivicCore. CivicCore does not depend on CivicGrants. CivicGrants v0.2.0 uses local-first staff-gated persistence with seeded starter opportunities, review-required context packets for CivicRecords/grant-file references, staff review queue records, and adversarial local mocks for integration-depth validation.

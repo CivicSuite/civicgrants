@@ -12,12 +12,12 @@ body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:#17202a;background
 <header>
   <p class="eyebrow">CivicSuite / CivicGrants</p>
   <h1>Grant files that survive the audit.</h1>
-  <p class="lede">CivicGrants v0.2.0 ships opportunity triage, eligibility factors, application outlines, compliance calendars, optional database-backed grant records, staff review queues, CivicRecords context packets, adversarial local mocks, audit-ready exports, and an accessible sample UI.</p>
+  <p class="lede">CivicGrants v0.2.0 ships opportunity triage, eligibility factors, application outlines, compliance calendars, default local database-backed grant records, staff review queues, CivicRecords context packets, adversarial local mocks, audit-ready exports, and accessible public and staff UIs.</p>
   <p><span class="badge">Recovery v0.2.0</span></p>
 </header>
 <main>
   <section class="grid">
-    <article class="card"><h2>What ships</h2><ul><li>Sample opportunity triage.</li><li>Eligibility-factor matching.</li><li>Application outline helper.</li><li>Compliance calendar helper.</li><li>Optional grant persistence with <code>CIVICGRANTS_GRANT_DB_URL</code>.</li><li>Readiness checks at <code>/ready</code>.</li><li>Staff queue routes protected by <code>CIVICGRANTS_STAFF_API_KEY</code>.</li><li>Review-required CivicRecords and grant-file context packets.</li><li>Adversarial local integration mocks.</li><li>Audit-ready export checklist.</li><li>Public sample UI at <code>/civicgrants</code>.</li></ul></article>
+    <article class="card"><h2>What ships</h2><ul><li>Sample opportunity triage.</li><li>Eligibility-factor matching.</li><li>Application outline helper.</li><li>Compliance calendar helper.</li><li>Default local grant persistence with optional explicit <code>CIVICGRANTS_GRANT_DB_URL</code>.</li><li>Readiness checks at <code>/ready</code>.</li><li>Staff queue routes protected by <code>CIVICGRANTS_STAFF_API_KEY</code>.</li><li>Review-required CivicRecords and grant-file context packets.</li><li>Adversarial local integration mocks.</li><li>Audit-ready export checklist.</li><li>Public sample UI at <code>/civicgrants</code> and staff UI at <code>/civicgrants/staff</code>.</li></ul></article>
     <article class="card"><h2>What does not ship</h2><p>CivicGrants does not determine official eligibility, submit applications, accept awards, provide legal advice, call live LLMs, use live funder feeds, or replace the grant system of record.</p></article>
     <article class="card"><h2>Repository</h2><p><a href="https://github.com/CivicSuite/civicgrants">github.com/CivicSuite/civicgrants</a></p></article>
     <article class="card"><h2>Dependency</h2><p>Pinned to the published <code>civiccore v1.2.0</code> release wheel. CivicCore remains dependency-only; it never imports from CivicGrants.</p></article>

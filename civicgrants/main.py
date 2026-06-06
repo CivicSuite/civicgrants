@@ -1,6 +1,7 @@
 """FastAPI runtime foundation for CivicGrants."""
 
 import os
+from pathlib import Path
 
 from civiccore import __version__ as CIVICCORE_VERSION
 from civiccore.auth import staff_key_gate
@@ -12,17 +13,15 @@ from pydantic import BaseModel, Field
 from civicgrants import __version__
 from civicgrants.application_draft import draft_application_outline
 from civicgrants.audit_file import build_audit_file_export
-from civicgrants.compliance_calendar import build_compliance_calendar
 from civicgrants.eligibility import match_grant_eligibility
 from civicgrants.integration_mocks import validate_grant_context_mocks
-from civicgrants.opportunity_triage import triage_opportunity
 from civicgrants.persistence import (
     GrantRecordsRepository,
     StaffReviewQueueItem,
     StaffReviewSummary,
     StoredComplianceCalendar,
 )
-from civicgrants.public_ui import render_public_lookup_page
+from civicgrants.public_ui import render_public_lookup_page, render_staff_page
 
 
 app = FastAPI(
@@ -106,10 +105,10 @@ def root() -> dict[str, str]:
     return {
         "name": "CivicGrants",
         "version": __version__,
-        "status": "grant support foundation plus grant persistence",
+        "status": "local-first grant support plus staff review queues",
         "message": (
             "CivicGrants package, API foundation, sample opportunity triage, eligibility matching, "
-            "application outline helper, compliance calendar helper, optional database-backed grant "
+            "application outline helper, compliance calendar helper, local-first database-backed grant "
             "opportunity and compliance records, staff review queues, review-required CivicRecords grant "
             "context packets, adversarial local integration mocks, audit-ready export checklist, and public "
             "UI foundation are online with readiness checks; live funder feeds, official eligibility "
@@ -117,8 +116,8 @@ def root() -> dict[str, str]:
             "system-of-record integrations are not implemented."
         ),
         "next_step": (
-            "Configure CIVICGRANTS_GRANT_DB_URL, import local grant opportunities, and verify "
-            "/ready before public use."
+            "Open /civicgrants/staff for staff review queues, verify /ready, and route grant file "
+            "exports to CivicRecords before official action."
         ),
     }
 
@@ -156,6 +155,56 @@ def public_civicgrants_page() -> str:
     return render_public_lookup_page()
 
 
+@app.get("/civicgrants/staff", response_class=HTMLResponse)
+def staff_civicgrants_page() -> str:
+    """Return the staff grant review queue UI."""
+
+    return render_staff_page()
+
+
+@app.get("/api/v1/civicgrants/integration-contracts")
+def integration_contracts() -> dict[str, object]:
+    """Return suite-visible integration contracts for installer and downstream checks."""
+
+    return {
+        "module": "civicgrants",
+        "version": __version__,
+        "contracts": [
+            {
+                "name": "civicgrants.opportunity_triage.v1",
+                "endpoint": "/api/v1/civicgrants/opportunities/triage",
+                "method": "POST",
+                "boundary": "Staff must verify funder source notices before official eligibility decisions.",
+            },
+            {
+                "name": "civicgrants.application_outline.v1",
+                "endpoint": "/api/v1/civicgrants/applications/outline",
+                "method": "POST",
+                "boundary": "Creates a draft outline and staff review item; it does not submit applications.",
+            },
+            {
+                "name": "civicgrants.staff_review_queue.v1",
+                "endpoint": "/api/v1/civicgrants/staff/reviews",
+                "method": "GET",
+                "requires_staff_key": True,
+                "boundary": "Staff-only review queue for grant decisions and follow-up.",
+            },
+            {
+                "name": "civicgrants.audit_file_export.v1",
+                "endpoint": "/api/v1/civicgrants/export",
+                "method": "POST",
+                "target": "civicrecords-ai",
+                "boundary": "Builds a records-ready checklist; it does not write a system of record.",
+            },
+        ],
+        "downstream_ready_for": [
+            "civicaccess public opportunity notices",
+            "civicprocure grant-funded procurement packages",
+            "civicrecords-ai grant file retention",
+        ],
+    }
+
+
 @app.post("/api/v1/civicgrants/opportunities/triage")
 def opportunity_triage(request: OpportunityTriageRequest) -> dict[str, object]:
     result = _triage_opportunity(
@@ -178,60 +227,33 @@ def eligibility_match(request: EligibilityRequest) -> dict[str, object]:
 
 @app.post("/api/v1/civicgrants/applications/outline")
 def application_outline(request: ApplicationOutlineRequest) -> dict[str, object]:
-    if _grant_database_url() is not None:
-        result = draft_application_outline(
-            project_name=request.project_name,
-            opportunity_title=request.opportunity_title,
-            city_need=request.city_need,
-        )
-        staff_review = _get_grant_repository().create_staff_review_queue_item(
-            opportunity_title=request.opportunity_title,
-            grant_id=request.grant_id,
-            reason="Grant application outline requires staff review before submission or award action.",
-            created_by="staff",
-        )
-        payload = result.__dict__
-        payload["staff_review_id"] = staff_review.review_id
-        return payload
-
     result = draft_application_outline(
         project_name=request.project_name,
         opportunity_title=request.opportunity_title,
         city_need=request.city_need,
     )
+    staff_review = _get_grant_repository().create_staff_review_queue_item(
+        opportunity_title=request.opportunity_title,
+        grant_id=request.grant_id,
+        reason="Grant application outline requires staff review before submission or award action.",
+        created_by="staff",
+    )
     payload = result.__dict__
-    payload["staff_review_id"] = None
+    payload["staff_review_id"] = staff_review.review_id
     return payload
 
 
 @app.post("/api/v1/civicgrants/compliance/calendar")
 def compliance_calendar(request: ComplianceCalendarRequest) -> dict[str, object]:
-    if _grant_database_url() is not None:
-        stored = _get_grant_repository().create_compliance_calendar(
-            award_name=request.award_name,
-            reporting_frequency=request.reporting_frequency,
-        )
-        return _stored_compliance_calendar_response(stored)
-
-    result = build_compliance_calendar(
+    stored = _get_grant_repository().create_compliance_calendar(
         award_name=request.award_name,
         reporting_frequency=request.reporting_frequency,
     )
-    payload = result.__dict__
-    payload["compliance_id"] = None
-    return payload
+    return _stored_compliance_calendar_response(stored)
 
 
 @app.get("/api/v1/civicgrants/compliance/{compliance_id}")
 def get_compliance_calendar(compliance_id: str) -> dict[str, object]:
-    if _grant_database_url() is None:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "message": "CivicGrants grant persistence is not configured.",
-                "fix": "Set CIVICGRANTS_GRANT_DB_URL to retrieve persisted compliance calendar records.",
-            },
-        )
     stored = _get_grant_repository().get_compliance_calendar(compliance_id)
     if stored is None:
         raise HTTPException(
@@ -387,19 +409,26 @@ async def validation_exception_handler(_request: object, exc: RequestValidationE
     )
 
 
-def _grant_database_url() -> str | None:
-    return os.environ.get("CIVICGRANTS_GRANT_DB_URL")
+def _grant_database_url() -> str:
+    configured = os.environ.get("CIVICGRANTS_GRANT_DB_URL")
+    if configured:
+        return configured
+    data_dir = Path(os.environ.get("CIVICGRANTS_DATA_DIR", Path.cwd() / "data")).resolve()
+    data_dir.mkdir(parents=True, exist_ok=True)
+    return f"sqlite+pysqlite:///{(data_dir / 'civicgrants-records.db').as_posix()}"
+
+
+def _uses_default_grant_database() -> bool:
+    return not os.environ.get("CIVICGRANTS_GRANT_DB_URL")
 
 
 def _get_grant_repository() -> GrantRecordsRepository:
     global _grant_db_url, _grant_repository
     db_url = _grant_database_url()
-    if db_url is None:
-        raise RuntimeError("CIVICGRANTS_GRANT_DB_URL is not configured.")
     if _grant_repository is None or db_url != _grant_db_url:
         _dispose_grant_repository()
         _grant_db_url = db_url
-        _grant_repository = GrantRecordsRepository(db_url=db_url, seed_defaults=False)
+        _grant_repository = GrantRecordsRepository(db_url=db_url, seed_defaults=_uses_default_grant_database())
     return _grant_repository
 
 
@@ -411,12 +440,6 @@ def _dispose_grant_repository() -> None:
 
 
 def _triage_opportunity(*, opportunity_title: str, funding_area: str, deadline: str = ""):
-    if _grant_database_url() is None:
-        return triage_opportunity(
-            opportunity_title=opportunity_title,
-            funding_area=funding_area,
-            deadline=deadline,
-        )
     return _get_grant_repository().triage_opportunity(
         opportunity_title=opportunity_title,
         funding_area=funding_area,
@@ -478,18 +501,6 @@ def _staff_review_summary_payload(summary: StaffReviewSummary) -> dict[str, obje
 
 def _readiness_payload() -> dict[str, object]:
     db_url = _grant_database_url()
-    if db_url is None:
-        return {
-            "status": "not-ready",
-            "ready": False,
-            "grant_database_configured": False,
-            "schema_ready": False,
-            "schema_version": None,
-            "expected_schema_version": None,
-            "opportunity_count": 0,
-            "blockers": ["Set CIVICGRANTS_GRANT_DB_URL to a local grant database."],
-        }
-
     repository = _get_grant_repository()
     schema_status = repository.schema_status()
     opportunity_count = repository.opportunity_record_count()
@@ -503,6 +514,8 @@ def _readiness_payload() -> dict[str, object]:
         "status": "ready" if ready_for_public_use else "not-ready",
         "ready": ready_for_public_use,
         "grant_database_configured": True,
+        "grant_database_url": db_url,
+        "using_default_local_database": _uses_default_grant_database(),
         "schema_ready": schema_status.ready,
         "schema_version": schema_status.schema_version,
         "expected_schema_version": schema_status.expected_schema_version,

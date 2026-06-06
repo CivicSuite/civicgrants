@@ -150,17 +150,21 @@ def test_configured_grant_database_does_not_seed_sample_opportunities(monkeypatc
         repository.engine.dispose()
 
 
-def test_readiness_requires_configured_grant_database(monkeypatch) -> None:
+def test_readiness_uses_default_local_database(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL", raising=False)
     _dispose_grant_repository()
 
     response = client.get("/api/v1/civicgrants/readiness")
 
     payload = response.json()
-    assert payload["status"] == "not-ready"
-    assert payload["ready"] is False
-    assert payload["grant_database_configured"] is False
-    assert "CIVICGRANTS_GRANT_DB_URL" in payload["blockers"][0]
+    assert payload["status"] == "ready"
+    assert payload["ready"] is True
+    assert payload["grant_database_configured"] is True
+    assert payload["using_default_local_database"] is True
+    assert payload["schema_ready"] is True
+    assert payload["opportunity_count"] == 2
+    assert payload["blockers"] == []
+    assert "civicgrants-records.db" in payload["grant_database_url"]
 
 
 def test_readiness_requires_imported_local_opportunities(monkeypatch, tmp_path: Path) -> None:
@@ -298,11 +302,20 @@ def test_staff_review_queue_lifecycle_is_staff_gated_and_persistent(monkeypatch,
     db_path.unlink()
 
 
-def test_staff_review_queue_requires_persistence_configuration(monkeypatch) -> None:
+def test_default_local_database_supports_staff_review_queue(monkeypatch) -> None:
     monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL", raising=False)
     monkeypatch.setenv("CIVICGRANTS_STAFF_API_KEY", "test-staff-key")
     _dispose_grant_repository()
 
+    created = client.post(
+        "/api/v1/civicgrants/applications/outline",
+        json={
+            "grant_id": "grant-default-local",
+            "project_name": "Default local grant file",
+            "opportunity_title": "Water infrastructure grant",
+            "city_need": "Local stormwater match needs review.",
+        },
+    )
     response = client.get(
         "/api/v1/civicgrants/staff/reviews",
         headers={"X-CivicGrants-Role": "staff", "X-CivicGrants-Staff-Key": "test-staff-key"},
@@ -310,20 +323,24 @@ def test_staff_review_queue_requires_persistence_configuration(monkeypatch) -> N
 
     monkeypatch.delenv("CIVICGRANTS_STAFF_API_KEY")
 
-    assert response.status_code == 503
-    assert "Set CIVICGRANTS_GRANT_DB_URL" in response.json()["detail"]["fix"]
+    assert created.status_code == 200
+    assert created.json()["staff_review_id"]
+    assert response.status_code == 200
+    items = response.json()["items"]
+    assert len(items) == 1
+    assert items[0]["grant_id"] == "grant-default-local"
 
 
-def test_get_compliance_calendar_without_persistence_returns_actionable_503(monkeypatch) -> None:
+def test_get_compliance_calendar_missing_default_local_id_returns_actionable_404(monkeypatch) -> None:
     monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL", raising=False)
     _dispose_grant_repository()
 
     response = client.get("/api/v1/civicgrants/compliance/example")
 
-    assert response.status_code == 503
+    assert response.status_code == 404
     detail = response.json()["detail"]
-    assert detail["message"] == "CivicGrants grant persistence is not configured."
-    assert "Set CIVICGRANTS_GRANT_DB_URL" in detail["fix"]
+    assert detail["message"] == "Compliance calendar record not found."
+    assert "POST /api/v1/civicgrants/compliance/calendar" in detail["fix"]
 
 
 def test_get_compliance_calendar_missing_id_returns_actionable_404(monkeypatch, tmp_path: Path) -> None:
@@ -343,7 +360,7 @@ def test_get_compliance_calendar_missing_id_returns_actionable_404(monkeypatch, 
     db_path.unlink()
 
 
-def test_plain_calendar_response_includes_null_compliance_id(monkeypatch) -> None:
+def test_default_local_calendar_response_includes_persisted_compliance_id(monkeypatch) -> None:
     monkeypatch.delenv("CIVICGRANTS_GRANT_DB_URL", raising=False)
     _dispose_grant_repository()
 
@@ -353,5 +370,6 @@ def test_plain_calendar_response_includes_null_compliance_id(monkeypatch) -> Non
     )
 
     assert response.status_code == 200
-    assert response.json()["compliance_id"] is None
+    payload = response.json()
+    assert payload["compliance_id"]
     assert os.environ.get("CIVICGRANTS_GRANT_DB_URL") is None

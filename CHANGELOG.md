@@ -6,6 +6,7 @@
 - Wired the public `/civicgrants` draft workflow to the local application-outline API and safe DOM rendering.
 - Added schema status, local opportunity import, and readiness gates that do not treat sample fallback as customer data.
 - Added bounded API request validation with actionable 422 responses.
+- Made CivicGrants local-first by default with a seeded SQLite data directory, persisted staff review/compliance flows, staff UI at `/civicgrants/staff`, and suite integration contract metadata.
 
 ## [0.2.0] - 2026-05-11
 

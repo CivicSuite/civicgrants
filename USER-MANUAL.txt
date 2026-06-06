@@ -4,18 +4,18 @@ CivicGrants User Manual
 For Non-Technical Users
 -----------------------
 
-CivicGrants helps city staff keep grant opportunities, eligibility notes, application outlines, reporting dates, staff review queues, CivicRecords context references, audit files, and an API-backed public sample UI organized.
+CivicGrants helps city staff keep grant opportunities, eligibility notes, application outlines, reporting dates, staff review queues, CivicRecords context references, audit files, and API-backed public and staff UIs organized.
 
-Current state: 0.2.0 grant support and staff review queue runtime. CivicGrants can optionally save grant opportunity, compliance-calendar, and staff review queue records when IT configures CIVICGRANTS_GRANT_DB_URL. Staff-only review routes also require CIVICGRANTS_STAFF_API_KEY.
+Current state: 0.2.0 local-first grant support and staff review queue runtime. CivicGrants saves grant opportunity, compliance-calendar, and staff review queue records in a default local SQLite database unless IT configures CIVICGRANTS_GRANT_DB_URL for an explicit database. Staff-only review routes also require CIVICGRANTS_STAFF_API_KEY.
 
 CivicGrants does not provide official eligibility decisions, legal advice, live funder feeds, live LLM calls, submission portals, award acceptance, or grant system-of-record updates. Staff own every decision.
 
 For IT and Technical Staff
 --------------------------
 
-CivicGrants is a FastAPI Python package pinned to the published civiccore v1.2.0 release wheel. It exposes grant triage, eligibility, application outline, compliance calendar, grant-review context, adversarial local mock, staff review queue, and audit export endpoints.
+CivicGrants is a FastAPI Python package pinned to the published civiccore v1.2.0 release wheel. It exposes grant triage, eligibility, application outline, compliance calendar, grant-review context, adversarial local mock, staff review queue, integration contract, staff UI, and audit export endpoints.
 
-Set CIVICGRANTS_GRANT_DB_URL to enable local SQLAlchemy-backed grant records. Use civicgrants-db-status to initialize/check schema, then load local opportunity CSV rows with civicgrants-import-opportunities. Required opportunity CSV columns are opportunity_key, opportunity_title, funding_area, deadline, priority, recommended_owner, and triage_notes. /ready and /api/v1/civicgrants/readiness remain not-ready until CIVICGRANTS_GRANT_DB_URL is configured and at least one local opportunity record is loaded. Set CIVICGRANTS_STAFF_API_KEY before using staff-only queue routes.
+Set CIVICGRANTS_DATA_DIR to choose the default local SQLite-backed grant data directory, or set CIVICGRANTS_GRANT_DB_URL when IT needs an explicit SQLAlchemy database URL. Use civicgrants-db-status to initialize/check explicit schema, then load local opportunity CSV rows with civicgrants-import-opportunities when replacing seeded starter records. Required opportunity CSV columns are opportunity_key, opportunity_title, funding_area, deadline, priority, recommended_owner, and triage_notes. Set CIVICGRANTS_STAFF_API_KEY before using staff-only queue routes.
 
 Run:
 
@@ -27,4 +27,4 @@ bash scripts/verify-release.sh
 Architecture
 ------------
 
-CivicGrants depends on CivicCore. CivicCore does not depend on CivicGrants. CivicGrants v0.2.0 uses deterministic sample data plus optional staff-gated persistence, review-required context packets for CivicRecords/grant-file references, staff review queue records, and adversarial local mocks for integration-depth validation.
+CivicGrants depends on CivicCore. CivicCore does not depend on CivicGrants. CivicGrants v0.2.0 uses local-first staff-gated persistence with seeded starter opportunities, review-required context packets for CivicRecords/grant-file references, staff review queue records, and adversarial local mocks for integration-depth validation.

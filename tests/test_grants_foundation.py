@@ -100,6 +100,8 @@ def test_grant_support_apis_success_shape() -> None:
     assert calendar.json()["reporting_frequency"] == "monthly"
     assert export.status_code == 200
     assert export.json()["grant_id"] == "grant-2026-001"
+    assert outline.json()["staff_review_id"]
+    assert calendar.json()["compliance_id"]
 
 
 def test_application_outline_validation_is_actionable() -> None:
@@ -142,3 +144,30 @@ def test_public_ui_uses_local_application_api_without_html_injection_sink() -> N
     assert "result.innerHTML" not in text
     assert "textContent" in text
     assert 'id="draft-button"' in text
+
+
+def test_staff_ui_route_is_accessible_and_uses_staff_queue_api_without_html_injection_sink() -> None:
+    response = client.get("/civicgrants/staff")
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    text = response.text
+    assert "Grant review queue" in text
+    assert 'fetch("/api/v1/civicgrants/applications/outline"' in text
+    assert 'fetch("/api/v1/civicgrants/staff/reviews"' in text
+    assert "X-CivicGrants-Staff-Key" in text
+    assert "innerHTML" not in text
+    assert "textContent" in text
+
+
+def test_integration_contracts_advertise_suite_ready_grant_contracts() -> None:
+    response = client.get("/api/v1/civicgrants/integration-contracts")
+    assert response.status_code == 200
+    payload = response.json()
+    contract_names = {contract["name"] for contract in payload["contracts"]}
+
+    assert payload["module"] == "civicgrants"
+    assert "civicgrants.opportunity_triage.v1" in contract_names
+    assert "civicgrants.application_outline.v1" in contract_names
+    assert "civicgrants.staff_review_queue.v1" in contract_names
+    assert "civicgrants.audit_file_export.v1" in contract_names
+    assert "civicrecords-ai grant file retention" in payload["downstream_ready_for"]
